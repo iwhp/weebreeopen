@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.22310.1
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.FtpClientLib", "WeebreeOpen.FtpClientLib\WeebreeOpen.FtpClientLib.csproj", "{B08DF973-B9FC-4E92-BA14-24D5B1AF8677}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.FtpClientLib.Test", "WeebreeOpen.FtpClientLib.Test\WeebreeOpen.FtpClientLib.Test.csproj", "{7DB1BB99-CCE4-4226-AF45-00475E9463D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.Office365Api", "WeebreeOpenOffice365Api\WeebreeOpen.Office365Api.csproj", "{1FBDC553-F861-4ED2-BF16-0DCC3D871AE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.Office365Api.Test", "WeebreeOpenOffice365Api.Test\WeebreeOpen.Office365Api.Test.csproj", "{0E317BBB-20A0-469D-BADD-4310911E52EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{7DB1BB99-CCE4-4226-AF45-00475E9463D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DB1BB99-CCE4-4226-AF45-00475E9463D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DB1BB99-CCE4-4226-AF45-00475E9463D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FBDC553-F861-4ED2-BF16-0DCC3D871AE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FBDC553-F861-4ED2-BF16-0DCC3D871AE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FBDC553-F861-4ED2-BF16-0DCC3D871AE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FBDC553-F861-4ED2-BF16-0DCC3D871AE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E317BBB-20A0-469D-BADD-4310911E52EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E317BBB-20A0-469D-BADD-4310911E52EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E317BBB-20A0-469D-BADD-4310911E52EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E317BBB-20A0-469D-BADD-4310911E52EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
