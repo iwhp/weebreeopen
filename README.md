@@ -1,6 +1,20 @@
-WeebreeOpen
-===========
+#WeebreeOpen
 
-This package will contain some (hopefully) usefull packages.
+This repository will contain some (hopefully) usefull packages ;-)
 
-The first is a .NET based FTP Client. It is in its initial state (alpha version).
+##WeebreeOpen.FtpClientLib
+
+Is a .NET based FTP Client. It is in an alpha version.
+
+Methods:
+
+    DirectoryListingGet(directory)
+    DirectoryListingRecursiveGet(directory)
+
+    DirectoryCreate(directory)
+    DirectoryDelete(directory)
+
+    FileDownload(source, target)
+    FileDownloadRecursive(soruce directory, target directory, replace, delete)
+
+    FileUpload(source, target)

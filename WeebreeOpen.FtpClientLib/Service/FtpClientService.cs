@@ -13,27 +13,81 @@
 
     public class FtpClientService
     {
+        #region Constructors
+
+        public FtpClientService(string serverNameOrIp, string userName, string password)
+        {
+            if (serverNameOrIp == null) { throw new ArgumentNullException("serverNameOrIp"); }
+            if (userName == null) { throw new ArgumentNullException("userName"); }
+            if (password == null) { throw new ArgumentNullException("password"); }
+
+            this.FtpClientConnection = new FtpClientConnection(serverNameOrIp, userName, password);
+        }
+
         public FtpClientService(FtpClientConnection connection)
         {
+            if (connection == null) { throw new ArgumentNullException("connection"); }
+
             this.FtpClientConnection = connection;
         }
 
+        #endregion
+
+        #region Properties
+
         public FtpClientConnection FtpClientConnection { get; private set; }
 
-        #region Get Directory Listings
+        //private string currentDirectory = "/";
 
-        public List<FtpEntry> GetDirectoryFileListing(string initialDirectoryPath = "")
+        //public string CurrentDirectory
+        //{
+        //    get
+        //    {
+        //        //return directory, ensure it ends with /
+        //        return currentDirectory + ((currentDirectory.EndsWith("/")) ? "" : "/").ToString();
+        //    }
+        //    set
+        //    {
+        //        if (!value.StartsWith("/"))
+        //        {
+        //            throw (new ApplicationException("Directory should start with /"));
+        //        }
+        //        currentDirectory = value;
+        //    }
+        //}
+
+        /// <summary>
+        /// List of REGEX formats for different FTP server listing formats.
+        /// </summary>
+        private static string[] _ParseFormats = new string[] {
+            //  UNIX/LINUX
+            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\w+\\s+\\w+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{4})\\s+(?<filename>.+)",
+            //  UNIX/LINUX
+            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\d+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{4})\\s+(?<filename>.+)",
+            //  UNIX/LINUX
+            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\d+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{1,2}:\\d{2})\\s+(?<filename>.+)",
+            //  MS FTP in detailed mode
+            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\w+\\s+\\w+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{1,2}:\\d{2})\\s+(?<filename>.+)",
+            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})(\\s+)(?<size>(\\d+))(\\s+)(?<ctbit>(\\w+\\s\\w+))(\\s+)(?<size2>(\\d+))\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{2}:\\d{2})\\s+(?<filename>.+)",
+            //  MS FTP in 'DOS' mode
+            "(?<timestamp>\\d{2}\\-\\d{2}\\-\\d{2}\\s+\\d{2}:\\d{2}[Aa|Pp][mM])\\s+(?<dir>\\<\\w+\\>){0,1}(?<size>\\d+){0,1}\\s+(?<filename>.+)" };
+
+        #endregion
+
+        #region Directory Listing
+
+        public List<FtpEntry> DirectoryListingGet(string initialDirectoryPath = "")
         {
             return ProcessListing(initialDirectoryPath).ToList();
         }
 
-        public List<FtpEntry> GetDirectoryFileListingRecursive(string initialDirectoryPath = "")
+        public List<FtpEntry> DirectoryListingRecursiveGet(string initialDirectoryPath = "")
         {
             List<FtpEntry> allEntries = ProcessListing(initialDirectoryPath).ToList();
 
             foreach (var rootItem in allEntries.Where(x => x.FtpEntryType == FtpEntryType.Directory).ToList())
             {
-                allEntries.AddRange(GetDirectoryFileListingRecursive(rootItem.DirectoryPath));
+                allEntries.AddRange(DirectoryListingRecursiveGet(rootItem.DirectoryPath));
             }
 
             return allEntries;
@@ -49,7 +103,15 @@
             ftpWebRequest.Credentials = new NetworkCredential(this.FtpClientConnection.UserName, this.FtpClientConnection.Password);
             ftpWebRequest.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
 
-            WebResponse response = ftpWebRequest.GetResponse();
+            WebResponse response;
+            try
+            {
+                response = ftpWebRequest.GetResponse();
+            }
+            catch (Exception)
+            {
+                return new List<FtpEntry>();
+            }
             StreamReader reader = new StreamReader(response.GetResponseStream());
 
             string line = reader.ReadLine();
@@ -74,6 +136,164 @@
             return ParseAndExtract(ftpWebResponseArray, directoryPath);
         }
 
+        private static IEnumerable<FtpEntry> ParseAndExtract(string[] lines, string directoryPathInital)
+        {
+
+            foreach (var line in lines)
+            {
+                Match split = GetMatchingRegex(line);
+
+                int x;
+                var dir = split.Groups["dir"].ToString();
+                //var permission = split.Groups["permission"].ToString();
+                //var filecode = split.Groups["filecode"].ToString();
+                //var owner = split.Groups["owner"].ToString();
+                //var group = split.Groups["group"].ToString();
+                var size = split.Groups["size"].ToString();
+                //var month = split.Groups["month"].ToString();
+                //var timeYear = split.Groups["year"].ToString();
+                //var time = split.Groups["time"].ToString();
+                //var day = split.Groups["day"].ToString();
+                DateTime dateTime;
+                try
+                {
+                    dateTime = DateTime.Parse(split.Groups["timestamp"].Value, new CultureInfo("en-US"));
+                }
+                catch (Exception)
+                {
+                    dateTime = Convert.ToDateTime(null);
+                }
+
+                var filename = split.Groups["filename"].ToString();
+
+                FtpEntryType ftpEntryType;
+                string directoryPath;
+                if (dir != "" && dir != "-")
+                {
+                    ftpEntryType = FtpEntryType.Directory;
+                    directoryPath = directoryPathInital + "/" + filename;
+                }
+                else
+                {
+                    ftpEntryType = FtpEntryType.File;
+                    directoryPath = directoryPathInital + "/" + filename;
+                }
+
+                yield return new FtpEntry()
+                {
+                    //Dir = dir,
+                    //Filecode = filecode,
+                    //Group = group,
+                    //FullPath = CurrentRemoteDirectory + "/ " + filename,
+                    Name = filename,
+                    //Owner = owner,
+                    //Permission = permission,
+                    Size = Int32.TryParse(size, out x) ? x : 0,
+                    DateTime = dateTime,
+                    FtpEntryType = ftpEntryType,
+                    DirectoryPath = directoryPath
+                    //Month = month,
+                    //Day = day,
+                    //YearTime = timeYear
+                };
+            }
+        }
+
+        #endregion
+
+        #region Directory Create, Delete
+
+        public bool DirectoryCreate(string dirpath)
+        {
+            //perform create
+            string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(dirpath);
+            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            //Set request to MkDir
+            ftp.Method = System.Net.WebRequestMethods.Ftp.MakeDirectory;
+            try
+            {
+                //get response but ignore it
+                string str = GetStringResponse(ftp);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public bool DirectoryDelete(string dirpath)
+        {
+            //perform remove
+            string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(dirpath);
+            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            //Set request to RmDir
+            ftp.Method = System.Net.WebRequestMethods.Ftp.RemoveDirectory;
+            try
+            {
+                //get response but ignore it
+                string str = GetStringResponse(ftp);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public bool DirectoryDeleteRecursive(string dirpath)
+        {
+            // Delete all entries within the diretory
+            List<FtpEntry> ftpEntries = DirectoryListingRecursiveGet(dirpath);
+
+            foreach (var ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
+            {
+                if (ftpEntry.FtpEntryType == FtpEntryType.File)
+                {
+                    bool isFileDeleteOK = FileDelete(ftpEntry.DirectoryPath);
+                    if (!isFileDeleteOK) { return false; }
+                }
+                else
+                {
+                    bool isDirectoryDeleteOK = DirectoryDelete(ftpEntry.DirectoryPath);
+                    if (!isDirectoryDeleteOK) { return false; }
+                }
+            }
+
+            // Delete the directory requested
+            return DirectoryDelete(dirpath);
+        }
+
+        /// <summary>
+        /// Obtains a response stream as a string
+        /// </summary>
+        /// <param name="ftp">current FTP request</param>
+        /// <returns>String containing response</returns>
+        /// <remarks>FTP servers typically return strings with CR and not CRLF. Use respons.Replace(vbCR, vbCRLF) to convert to an MSDOS string</remarks>
+        private string GetStringResponse(FtpWebRequest ftp)
+        {
+            //Get the result, streaming to a string
+            string result = "";
+            using (FtpWebResponse response = (FtpWebResponse)ftp.GetResponse())
+            {
+                long size = response.ContentLength;
+                using (Stream datastream = response.GetResponseStream())
+                {
+                    using (StreamReader sr = new StreamReader(datastream))
+                    {
+                        result = sr.ReadToEnd();
+                        sr.Close();
+                    }
+
+                    datastream.Close();
+                }
+
+                response.Close();
+            }
+
+            return result;
+        }
+
         #endregion
 
         #region File Download
@@ -86,7 +306,7 @@
 
         public bool FileDownloadRecursive(string sourceStartingPath, string targetStartingPath, bool overrideExisting = false, bool deleteSourceAfterDownload = false)
         {
-            List<FtpEntry> ftpEntries = GetDirectoryFileListingRecursive(sourceStartingPath);
+            List<FtpEntry> ftpEntries = DirectoryListingRecursiveGet(sourceStartingPath);
 
             System.IO.Directory.CreateDirectory(targetStartingPath);
 
@@ -94,7 +314,13 @@
             foreach (var ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
             {
                 // Build target path
-                string targetFilePath = targetStartingPath + ftpEntry.DirectoryPath.Replace(sourceStartingPath, "").Replace("/", @"\");
+                string x1 = ftpEntry.DirectoryPath;
+                if (!string.IsNullOrWhiteSpace(sourceStartingPath))
+                {
+                    x1 = ftpEntry.DirectoryPath.Replace(sourceStartingPath, "");
+                }
+
+                string targetFilePath = targetStartingPath + x1.Replace("/", @"\");
 
                 string targetPath;
                 if (ftpEntry.FtpEntryType == FtpEntryType.File)
@@ -161,7 +387,7 @@
             else
             {
                 //treat as filename only, use current directory
-                source = CurrentDirectory + sourceFilename;
+                source = sourceFilename;
             }
 
             string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + source;
@@ -219,52 +445,6 @@
             return true;
         }
 
-        private string AdjustDir(string path)
-        {
-            return ((path.StartsWith("/")) ? "" : "/").ToString() + path;
-        }
-
-        private string _currentDirectory = "/";
-        public string CurrentDirectory
-        {
-            get
-            {
-                //return directory, ensure it ends with /
-                return _currentDirectory + ((_currentDirectory.EndsWith("/")) ? "" : "/").ToString();
-            }
-            set
-            {
-                if (!value.StartsWith("/"))
-                {
-                    throw (new ApplicationException("Directory should start with /"));
-                }
-                _currentDirectory = value;
-            }
-        }
-
-        //Get the basic FtpWebRequest object with the
-        //common settings and security
-        private FtpWebRequest GetRequest(string URI)
-        {
-            //create request
-            FtpWebRequest result = (FtpWebRequest)FtpWebRequest.Create(URI);
-            //Set the login details
-            result.Credentials = GetCredentials();
-            //Do not keep alive (stateless mode)
-            result.KeepAlive = false;
-            return result;
-        }
-
-
-        /// <summary>
-        /// Get the credentials from username/password
-        /// </summary>
-        private System.Net.ICredentials GetCredentials()
-        {
-            return new System.Net.NetworkCredential(this.FtpClientConnection.UserName, this.FtpClientConnection.Password);
-        }
-
-
         #endregion
 
         #region File Upload
@@ -305,7 +485,7 @@
             if (targetFilename.Trim() == "")
             {
                 //Blank target: use source filename & current dir
-                target = this.CurrentDirectory + fi.Name;
+                target = fi.Name;
             }
             else if (targetFilename.Contains("/"))
             {
@@ -315,7 +495,7 @@
             else
             {
                 //otherwise treat as filename only, use current directory
-                target = CurrentDirectory + targetFilename;
+                target = targetFilename;
             }
 
             string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + target;
@@ -372,7 +552,7 @@
 
         #endregion
 
-        #region File
+        #region File Delete
 
         /// <summary>
         /// Delete remote file
@@ -400,174 +580,29 @@
             return true;
         }
 
-        private string GetFullPath(string file)
-        {
-            if (file.Contains("/"))
-            {
-                return AdjustDir(file);
-            }
-            else
-            {
-                return this.CurrentDirectory + file;
-            }
-        }
-
         #endregion
 
-        #region Directory 
+        #region Helper
 
-        public bool DirectoryCreate(string dirpath)
+        //Get the basic FtpWebRequest object with the
+        //common settings and security
+        private FtpWebRequest GetRequest(string URI)
         {
-            //perform create
-            string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(dirpath);
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
-            //Set request to MkDir
-            ftp.Method = System.Net.WebRequestMethods.Ftp.MakeDirectory;
-            try
-            {
-                //get response but ignore it
-                string str = GetStringResponse(ftp);
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public bool DirectoryDelete(string dirpath)
-        {
-            //perform remove
-            string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(dirpath);
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
-            //Set request to RmDir
-            ftp.Method = System.Net.WebRequestMethods.Ftp.RemoveDirectory;
-            try
-            {
-                //get response but ignore it
-                string str = GetStringResponse(ftp);
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Obtains a response stream as a string
-        /// </summary>
-        /// <param name="ftp">current FTP request</param>
-        /// <returns>String containing response</returns>
-        /// <remarks>FTP servers typically return strings with CR and
-        /// not CRLF. Use respons.Replace(vbCR, vbCRLF) to convert
-        /// to an MSDOS string</remarks>
-        private string GetStringResponse(FtpWebRequest ftp)
-        {
-            //Get the result, streaming to a string
-            string result = "";
-            using (FtpWebResponse response = (FtpWebResponse)ftp.GetResponse())
-            {
-                long size = response.ContentLength;
-                using (Stream datastream = response.GetResponseStream())
-                {
-                    using (StreamReader sr = new StreamReader(datastream))
-                    {
-                        result = sr.ReadToEnd();
-                        sr.Close();
-                    }
-
-                    datastream.Close();
-                }
-
-                response.Close();
-            }
-
+            //create request
+            FtpWebRequest result = (FtpWebRequest)FtpWebRequest.Create(URI);
+            //Set the login details
+            result.Credentials = GetCredentials();
+            //Do not keep alive (stateless mode)
+            result.KeepAlive = false;
             return result;
         }
 
-        #endregion
-
-        #region Parse recieved file and directoy listing and build enumeration of FtpEntry
-
-
         /// <summary>
-        /// List of REGEX formats for different FTP server listing formats.
+        /// Get the credentials from username/password
         /// </summary>
-        private static string[] _ParseFormats = new string[] {
-            //  UNIX/LINUX
-            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\w+\\s+\\w+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{4})\\s+(?<filename>.+)",
-            //  UNIX/LINUX
-            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\d+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{4})\\s+(?<filename>.+)",
-            //  UNIX/LINUX
-            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\d+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{1,2}:\\d{2})\\s+(?<filename>.+)",
-            //  MS FTP in detailed mode
-            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\w+\\s+\\w+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{1,2}:\\d{2})\\s+(?<filename>.+)",
-            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})(\\s+)(?<size>(\\d+))(\\s+)(?<ctbit>(\\w+\\s\\w+))(\\s+)(?<size2>(\\d+))\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{2}:\\d{2})\\s+(?<filename>.+)",
-            //  MS FTP in 'DOS' mode
-            "(?<timestamp>\\d{2}\\-\\d{2}\\-\\d{2}\\s+\\d{2}:\\d{2}[Aa|Pp][mM])\\s+(?<dir>\\<\\w+\\>){0,1}(?<size>\\d+){0,1}\\s+(?<filename>.+)" };
-
-        private static IEnumerable<FtpEntry> ParseAndExtract(string[] lines, string directoryPathInital)
+        private System.Net.ICredentials GetCredentials()
         {
-
-            foreach (var line in lines)
-            {
-                Match split = GetMatchingRegex(line);
-
-                int x;
-                var dir = split.Groups["dir"].ToString();
-                //var permission = split.Groups["permission"].ToString();
-                //var filecode = split.Groups["filecode"].ToString();
-                //var owner = split.Groups["owner"].ToString();
-                //var group = split.Groups["group"].ToString();
-                var size = split.Groups["size"].ToString();
-                //var month = split.Groups["month"].ToString();
-                //var timeYear = split.Groups["year"].ToString();
-                //var time = split.Groups["time"].ToString();
-                //var day = split.Groups["day"].ToString();
-                DateTime dateTime;
-                try
-                {
-                    dateTime = DateTime.Parse(split.Groups["timestamp"].Value, new CultureInfo("en-US"));
-                }
-                catch (Exception)
-                {
-                    dateTime = Convert.ToDateTime(null);
-                }
-
-                var filename = split.Groups["filename"].ToString();
-
-                FtpEntryType ftpEntryType;
-                string directoryPath;
-                if (dir != "" && dir != "-")
-                {
-                    ftpEntryType = FtpEntryType.Directory;
-                    directoryPath = directoryPathInital + "/" + filename;
-                }
-                else
-                {
-                    ftpEntryType = FtpEntryType.File;
-                    directoryPath = directoryPathInital + "/" + filename;
-                }
-
-                yield return new FtpEntry()
-                {
-                    //Dir = dir,
-                    //Filecode = filecode,
-                    //Group = group,
-                    //FullPath = CurrentRemoteDirectory + "/ " + filename,
-                    Name = filename,
-                    //Owner = owner,
-                    //Permission = permission,
-                    Size = Int32.TryParse(size, out x) ? x : 0,
-                    DateTime = dateTime,
-                    FtpEntryType = ftpEntryType,
-                    DirectoryPath = directoryPath
-                    //Month = month,
-                    //Day = day,
-                    //YearTime = timeYear
-                };
-            }
+            return new System.Net.NetworkCredential(this.FtpClientConnection.UserName, this.FtpClientConnection.Password);
         }
 
         private static Match GetMatchingRegex(string line)
@@ -584,6 +619,23 @@
                 }
             }
             return null;
+        }
+
+        private string AdjustDir(string path)
+        {
+            return ((path.StartsWith("/")) ? "" : "/").ToString() + path;
+        }
+
+        private string GetFullPath(string file)
+        {
+            if (file.Contains("/"))
+            {
+                return AdjustDir(file);
+            }
+            else
+            {
+                return file;
+            }
         }
 
         #endregion
