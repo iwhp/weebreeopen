@@ -48,20 +48,20 @@
             FtpClientService ftpClientService = new FtpClientService(TestSetupCleanup.FtpClientConnection);
 
             // Delete all
-            ftpClientService.DirectoryDeleteRecursive(TestSetupCleanup.FtpTestRootFolder);
+            ftpClientService.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
 
             // Create root directory
-            ftpClientService.DirectoryCreate(TestSetupCleanup.FtpTestRootFolder);
+            ftpClientService.CreateDirectory(TestSetupCleanup.FtpTestRootFolder);
 
             // Create subdirectories
-            ftpClientService.DirectoryCreate(TestSetupCleanup.FtpDirectory1);
-            ftpClientService.DirectoryCreate(TestSetupCleanup.FtpDirectory2);
+            ftpClientService.CreateDirectory(TestSetupCleanup.FtpDirectory1);
+            ftpClientService.CreateDirectory(TestSetupCleanup.FtpDirectory2);
 
             // Add test files
-            ftpClientService.FileUpload(TestSetupCleanup.TestDataFileText1, TestSetupCleanup.FtpFileText1);
-            ftpClientService.FileUpload(TestSetupCleanup.TestDataFileBinary1, TestSetupCleanup.FtpFileBinary1);
-            ftpClientService.FileUpload(TestSetupCleanup.TestDataFileText1, TestSetupCleanup.FtpFileText3);
-            ftpClientService.FileUpload(TestSetupCleanup.TestDataFileBinary1, TestSetupCleanup.FtpFileBinary4);
+            ftpClientService.UploadFile(TestSetupCleanup.TestDataFileText1, TestSetupCleanup.FtpFileText1);
+            ftpClientService.UploadFile(TestSetupCleanup.TestDataFileBinary1, TestSetupCleanup.FtpFileBinary1);
+            ftpClientService.UploadFile(TestSetupCleanup.TestDataFileText1, TestSetupCleanup.FtpFileText3);
+            ftpClientService.UploadFile(TestSetupCleanup.TestDataFileBinary1, TestSetupCleanup.FtpFileBinary4);
         }
 
         #endregion
@@ -72,7 +72,7 @@
         public static void AssemblyCleanup()
         {
             FtpClientService ftpClientService = new FtpClientService(TestSetupCleanup.FtpClientConnection);
-            ftpClientService.DirectoryDeleteRecursive(TestSetupCleanup.FtpTestRootFolder);
+            ftpClientService.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
         }
 
         #endregion
