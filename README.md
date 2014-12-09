@@ -8,13 +8,16 @@ Is a .NET based FTP Client. It is in an alpha version.
 
 Methods:
 
-    DirectoryListingGet(directory)
-    DirectoryListingRecursiveGet(directory)
+    GetDirectoryListing(directory)
+    GetDirectoryListingRecursive(directory)
 
-    DirectoryCreate(directory)
-    DirectoryDelete(directory)
+    CreateDirectory(directory)
+    DeleteDirectory(directory)
+    DeleteDirectoryRecursive(directory)
 
-    FileDownload(source, target)
-    FileDownloadRecursive(soruce directory, target directory, replace, delete)
+    DownloadFile(source, target)
+    DownloadFileRecursive(soruce directory, target directory, replace, delete)
 
-    FileUpload(source, target)
+    DeleteFile(source)
+    UploadFile(source, target)
+

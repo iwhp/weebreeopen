@@ -76,18 +76,18 @@
 
         #region Directory Listing
 
-        public List<FtpEntry> DirectoryListingGet(string initialDirectoryPath = "")
+        public List<FtpEntry> GetDirectoryListing(string initialDirectoryPath = "")
         {
             return ProcessListing(initialDirectoryPath).ToList();
         }
 
-        public List<FtpEntry> DirectoryListingRecursiveGet(string initialDirectoryPath = "")
+        public List<FtpEntry> GetDirectoryListingRecursive(string initialDirectoryPath = "")
         {
             List<FtpEntry> allEntries = ProcessListing(initialDirectoryPath).ToList();
 
             foreach (var rootItem in allEntries.Where(x => x.FtpEntryType == FtpEntryType.Directory).ToList())
             {
-                allEntries.AddRange(DirectoryListingRecursiveGet(rootItem.DirectoryPath));
+                allEntries.AddRange(GetDirectoryListingRecursive(rootItem.DirectoryPath));
             }
 
             return allEntries;
@@ -203,7 +203,7 @@
 
         #region Directory Create, Delete
 
-        public bool DirectoryCreate(string dirpath)
+        public bool CreateDirectory(string dirpath)
         {
             //perform create
             string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(dirpath);
@@ -222,7 +222,7 @@
             return true;
         }
 
-        public bool DirectoryDelete(string dirpath)
+        public bool DeleteDirectory(string dirpath)
         {
             //perform remove
             string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(dirpath);
@@ -241,27 +241,27 @@
             return true;
         }
 
-        public bool DirectoryDeleteRecursive(string dirpath)
+        public bool DeleteDirectoryRecursive(string dirpath)
         {
             // Delete all entries within the diretory
-            List<FtpEntry> ftpEntries = DirectoryListingRecursiveGet(dirpath);
+            List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(dirpath);
 
             foreach (var ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
             {
                 if (ftpEntry.FtpEntryType == FtpEntryType.File)
                 {
-                    bool isFileDeleteOK = FileDelete(ftpEntry.DirectoryPath);
+                    bool isFileDeleteOK = DeleteFile(ftpEntry.DirectoryPath);
                     if (!isFileDeleteOK) { return false; }
                 }
                 else
                 {
-                    bool isDirectoryDeleteOK = DirectoryDelete(ftpEntry.DirectoryPath);
+                    bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.DirectoryPath);
                     if (!isDirectoryDeleteOK) { return false; }
                 }
             }
 
             // Delete the directory requested
-            return DirectoryDelete(dirpath);
+            return DeleteDirectory(dirpath);
         }
 
         /// <summary>
@@ -298,15 +298,15 @@
 
         #region File Download
 
-        public bool FileDownload(string sourceFilename, string targetFilename, bool permitOverwrite, DateTime? setDateTimeForFile = null)
+        public bool DownloadFile(string sourceFilename, string targetFilename, bool permitOverwrite, DateTime? setDateTimeForFile = null)
         {
             FileInfo fi = new FileInfo(targetFilename);
             return this.FileDownload(sourceFilename, fi, permitOverwrite, setDateTimeForFile);
         }
 
-        public bool FileDownloadRecursive(string sourceStartingPath, string targetStartingPath, bool overrideExisting = false, bool deleteSourceAfterDownload = false)
+        public bool DownloadFileRecursive(string sourceStartingPath, string targetStartingPath, bool overrideExisting = false, bool deleteSourceAfterDownload = false)
         {
-            List<FtpEntry> ftpEntries = DirectoryListingRecursiveGet(sourceStartingPath);
+            List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(sourceStartingPath);
 
             System.IO.Directory.CreateDirectory(targetStartingPath);
 
@@ -339,7 +339,7 @@
                 bool isFileDownloadOK = true;
                 if (ftpEntry.FtpEntryType == FtpEntryType.File)
                 {
-                    isFileDownloadOK = FileDownload(ftpEntry.DirectoryPath, targetFilePath, overrideExisting, ftpEntry.DateTime);
+                    isFileDownloadOK = DownloadFile(ftpEntry.DirectoryPath, targetFilePath, overrideExisting, ftpEntry.DateTime);
                 }
 
                 if (isFileDownloadOK)
@@ -348,12 +348,12 @@
                     {
                         if (ftpEntry.FtpEntryType == FtpEntryType.File)
                         {
-                            bool isFileDeleteOK = FileDelete(ftpEntry.DirectoryPath);
+                            bool isFileDeleteOK = DeleteFile(ftpEntry.DirectoryPath);
                             if (!isFileDeleteOK) { return false; }
                         }
 
                         // Delete Directory (if not empty, it will not be deleted (return code = false))
-                        bool isDirectoryDeleteOK = DirectoryDelete(ftpEntry.DirectoryPath);
+                        bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.DirectoryPath);
                     }
                 }
                 else
@@ -458,7 +458,7 @@
         /// <remarks>If the target filename is blank, the source filename is used
         /// (assumes current directory). Otherwise use a filename to specify a name
         /// or a full path and filename if required.</remarks>
-        public bool FileUpload(string localFilename, string targetFilename)
+        public bool UploadFile(string localFilename, string targetFilename)
         {
             //1. check source
             if (!File.Exists(localFilename))
@@ -467,7 +467,7 @@
             }
             //copy to FI
             FileInfo fi = new FileInfo(localFilename);
-            return FileUpload(fi, targetFilename);
+            return UploadFile(fi, targetFilename);
         }
 
         /// <summary>
@@ -476,7 +476,7 @@
         /// <param name="fi">Source file</param>
         /// <param name="targetFilename">Target filename (optional)</param>
         /// <returns></returns>
-        private bool FileUpload(FileInfo fi, string targetFilename)
+        private bool UploadFile(FileInfo fi, string targetFilename)
         {
             //copy the file specified to target file: target file can be full path or just filename (uses current dir)
 
@@ -560,7 +560,7 @@
         /// <param name="filename">filename or full path</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool FileDelete(string filename)
+        public bool DeleteFile(string filename)
         {
             //Determine if file or full path
             string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + GetFullPath(filename);
