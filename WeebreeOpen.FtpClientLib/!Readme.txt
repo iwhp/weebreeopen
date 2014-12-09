@@ -1,5 +1,11 @@
 ﻿============================================================================================================
-DEPLOYMENT (NEW NUGET PACKAGE)
+DEPLOYMENT (NUGET PACKAGE)
+------------------------------------------------------------------------------------------------------------
+> DEPLOY FROM 
+     D:\!Data\Source\Git.Github\AzurePortalStyleNg\AzurePortalStyleNg\AzurePortalStyleNg.Ui.Web\!!Out-Nuget
+  TO:
+     https://www.nuget.org/packages/AzurePortalStyleNg
+============================================================================================================
 ------------------------------------------------------------------------------------------------------------
 > INSTALL VS EXTENSTION: NuGet Deploy
   > INSTALL https://visualstudiogallery.msdn.microsoft.com/455301f5-cc32-4261-b4da-998bd9a6a690

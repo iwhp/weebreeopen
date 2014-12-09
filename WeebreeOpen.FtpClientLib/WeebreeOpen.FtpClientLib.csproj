@@ -50,6 +50,7 @@
     <Content Include="!Readme.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="nuspec-packager.config" />
     <None Include="Package.nuspec" />
   </ItemGroup>
   <ItemGroup />
