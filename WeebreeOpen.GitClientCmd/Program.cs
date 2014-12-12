@@ -11,10 +11,24 @@
     {
         static void Main(string[] args)
         {
+
             GitClientService service = new GitClientService();
             List<string> repositoriesRoots = service.FindRepositories(Properties.Settings.Default.SearchForGitRepositoryStartDirectory);
             List<RepositoryDetails> repositoryDetails = service.GetRepositoryDetails(repositoriesRoots, true);
 
+            #region Show Repositories
+
+            Console.WriteLine("\nShow Repositories ==============================================");
+            foreach (var repositoryDetail in repositoryDetails)
+            {
+                Console.WriteLine(string.Format("{0}", repositoryDetail.RepositoryPath));
+            }
+
+            #endregion
+
+            #region Show StatusEntries for repositories
+
+            Console.WriteLine("\nShow StatusEntries for repositories =============================");
             foreach (var repositoryDetail in repositoryDetails)
             {
                 foreach (var statusEntry in repositoryDetail.StatusEntries.Where(x => x.State != FileStatus.Ignored))
@@ -23,6 +37,7 @@
                 }
             }
 
+            #endregion
         }
     }
 }

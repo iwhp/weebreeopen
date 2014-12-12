@@ -9,6 +9,30 @@
 
     public class GitClientService
     {
+        public void DeleteRepositories(string gitRootDirectory)
+        {
+            #region Verify Parameters
+
+            if (string.IsNullOrWhiteSpace(gitRootDirectory))
+            {
+                throw new ArgumentNullException("gitRootDirectory");
+            }
+
+            if (!Directory.Exists(gitRootDirectory))
+            {
+                throw new ArgumentException("Path does not exist.", "gitRootDirectory");
+            }
+
+            if (!IsDirectoryRootDirectory(gitRootDirectory))
+            {
+                throw new ArgumentException("Path is not a git root directory.", "gitRootDirectory");
+            }
+
+            #endregion
+
+            Directory.Delete(gitRootDirectory);
+        }
+
         public List<string> FindRepositories(string startingPath)
         {
             #region Verify Parameters
