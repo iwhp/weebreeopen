@@ -1,4 +1,4 @@
-﻿namespace WeebreeOpen.FtpClientLib.Test
+﻿namespace WeebreeOpen.FtpClientLib.Test.Test
 {
     using System;
     using System.Collections.Generic;

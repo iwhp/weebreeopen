@@ -6,6 +6,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using WeebreeOpen.FtpClientLib.Model;
     using WeebreeOpen.FtpClientLib.Service;
+    using WeebreeOpen.FtpClientLib.Test.Test;
 
     [TestClass]
     public class FtpClientServiceTest

@@ -157,9 +157,26 @@
                 DateTime dateTime;
                 try
                 {
-                    dateTime = DateTime.Parse(split.Groups["timestamp"].Value, new CultureInfo("en-US"));
+                    string dateTimeString = split.Groups["timestamp"].Value;
+                    Console.WriteLine("Date from Ftp Server: " + dateTimeString);
+                    if (dateTimeString.Substring(3, 1) == " ") // "Dec 19 15:44"
+                    {
+                        if (dateTimeString.Length == 12)
+                        {
+                            dateTimeString = dateTimeString.Substring(0, 7) + DateTime.Now.Year + " " + dateTimeString.Substring(7, 5);
+                            if (dateTimeString.Substring(4, 1) == " ")
+                            {
+                                dateTimeString = dateTimeString.Substring(0, 4) + dateTimeString.Substring(5);
+                            }
+                        }
+                        dateTime = DateTime.ParseExact(dateTimeString, "MMM d yyyy HH:mm", CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        dateTime = DateTime.Parse(split.Groups["timestamp"].Value, new CultureInfo("en-US"));
+                    }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     dateTime = Convert.ToDateTime(null);
                 }
@@ -332,13 +349,17 @@
                     targetPath = targetFilePath;
                 }
 
-                DirectoryInfo directoryCreated = System.IO.Directory.CreateDirectory(targetPath);
-                directoryCreated.CreationTime = ftpEntry.DateTime;
-                directoryCreated.LastWriteTime = ftpEntry.DateTime;
+                if (AddSuffix(targetStartingPath, @"\") != AddSuffix(targetPath, @"\"))
+                {
+                    DirectoryInfo directoryCreated = Directory.CreateDirectory(targetPath);
+                    directoryCreated.CreationTime = ftpEntry.DateTime;
+                    directoryCreated.LastWriteTime = ftpEntry.DateTime;
+                }
 
                 bool isFileDownloadOK = true;
                 if (ftpEntry.FtpEntryType == FtpEntryType.File)
                 {
+                    Console.WriteLine(ftpEntry.DateTime);
                     isFileDownloadOK = DownloadFile(ftpEntry.DirectoryPath, targetFilePath, overrideExisting, ftpEntry.DateTime);
                 }
 
@@ -636,6 +657,16 @@
             {
                 return file;
             }
+        }
+
+        private string AddSuffix(string target, string suffix)
+        {
+            if (target.Substring(target.Length - 1) != suffix)
+            {
+                target += suffix;
+            }
+
+            return target;
         }
 
         #endregion
