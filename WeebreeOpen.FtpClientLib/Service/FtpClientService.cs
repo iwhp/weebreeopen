@@ -603,6 +603,48 @@
 
         #endregion
 
+        #region Convert FtpServiceArgs
+
+        public static string BuildHtmlMessage(List<FtpServiceEventArgs> ftpServiceEvents)
+        {
+            string outputHtml = "";
+
+            // Handle errors
+            outputHtml += "<h1>FTP SERVICE ERRORS</h1>";
+            outputHtml += string.Format("<p>Errors Occurred: {0}</p>", ftpServiceEvents.Where(x => x.Type == FtpServiceEventType.Error).Count());
+            outputHtml += "<ul>";
+
+            foreach (var item in ftpServiceEvents.Where(x => x.Type == FtpServiceEventType.Error).OrderBy(x => x.EventOccuredAt))
+            {
+                outputHtml += string.Format("<li>{0} - {1}<br/>From: {2}{3}{4}{5}<br/>To: {6}{7}<br>{8}</li>",
+                    item.Type, item.Message,
+                    item.Directory, item.File, item.DirectoryFrom, item.FileFrom,
+                    item.DirectoryTo, item.FileTo,
+                    item.Exception.ToString());
+            }
+
+            outputHtml += "</ul>";
+
+            // Handle all others
+            outputHtml += "<h1>FTP SERVICE ACTIONS</h1>";
+            outputHtml += string.Format("<p>Number of Actions: {0}", ftpServiceEvents.Where(x => x.Type != FtpServiceEventType.Error).Count());
+            outputHtml += "<ul>";
+
+            foreach (var item in ftpServiceEvents.Where(x => x.Type != FtpServiceEventType.Error).OrderBy(x => x.EventOccuredAt))
+            {
+                outputHtml += string.Format("<li>{0} - {1}<br/>From: {2}{3}{4}{5}<br/>To: {6}{7}<br>{8}</li>",
+                    item.Type, item.Message,
+                    item.Directory, item.File, item.DirectoryFrom, item.FileFrom,
+                    item.DirectoryTo, item.FileTo,
+                    item.Exception.ToString());
+            }
+            outputHtml += "</ul>";
+
+            return outputHtml;
+        }
+
+        #endregion
+
         #region Helper
 
         /// <summary>
