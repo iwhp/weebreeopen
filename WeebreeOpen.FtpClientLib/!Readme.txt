@@ -2,11 +2,12 @@
 DEPLOYMENT (NUGET PACKAGE)
 ------------------------------------------------------------------------------------------------------------
 > DEPLOY FROM 
-     D:\!Data\Source\Git.Github\AzurePortalStyleNg\AzurePortalStyleNg\AzurePortalStyleNg.Ui.Web\!!Out-Nuget
+    D:\!Data\Source\Git.Github\iwhp\weebreeopen\WeebreeOpen.FtpClientLib\!!Out-NuGet
   TO:
-     https://www.nuget.org/packages/AzurePortalStyleNg
+    https://www.nuget.org/packages/WeebreeOpen.FtpClientLib
 ============================================================================================================
-------------------------------------------------------------------------------------------------------------
+
+============================================================================================================
 > INSTALL VS EXTENSTION: NuGet Deploy
   > INSTALL https://visualstudiogallery.msdn.microsoft.com/455301f5-cc32-4261-b4da-998bd9a6a690
   > DOCU:   https://dl.dropboxusercontent.com/u/2557744/documentation.pdf

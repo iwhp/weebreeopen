@@ -42,6 +42,8 @@
     <Compile Include="Model\FtpClientConnection.cs" />
     <Compile Include="Model\FtpEntryType.cs" />
     <Compile Include="Model\FtpEntry.cs" />
+    <Compile Include="Model\FtpServiceEventType.cs" />
+    <Compile Include="Model\FtpServiceEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="!Samples\FtpClient.cs" />
     <Compile Include="Service\FtpClientService.cs" />

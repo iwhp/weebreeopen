@@ -59,7 +59,8 @@
         /// <summary>
         /// List of REGEX formats for different FTP server listing formats.
         /// </summary>
-        private static string[] _ParseFormats = new string[] {
+        private static readonly string[] parseFormats = new string[]
+        {
             //  UNIX/LINUX
             "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\w+\\s+\\w+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{4})\\s+(?<filename>.+)",
             //  UNIX/LINUX
@@ -70,7 +71,24 @@
             "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\w+\\s+\\w+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{1,2}:\\d{2})\\s+(?<filename>.+)",
             "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})(\\s+)(?<size>(\\d+))(\\s+)(?<ctbit>(\\w+\\s\\w+))(\\s+)(?<size2>(\\d+))\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{2}:\\d{2})\\s+(?<filename>.+)",
             //  MS FTP in 'DOS' mode
-            "(?<timestamp>\\d{2}\\-\\d{2}\\-\\d{2}\\s+\\d{2}:\\d{2}[Aa|Pp][mM])\\s+(?<dir>\\<\\w+\\>){0,1}(?<size>\\d+){0,1}\\s+(?<filename>.+)" };
+            "(?<timestamp>\\d{2}\\-\\d{2}\\-\\d{2}\\s+\\d{2}:\\d{2}[Aa|Pp][mM])\\s+(?<dir>\\<\\w+\\>){0,1}(?<size>\\d+){0,1}\\s+(?<filename>.+)"
+        };
+
+        #endregion
+
+        #region Event
+
+        public event EventHandler<FtpServiceEventArgs> FtpServiceEvent;
+
+        protected virtual void OnRaiseFtpServiceEvent(FtpServiceEventArgs e)
+        {
+            EventHandler<FtpServiceEventArgs> handler = FtpServiceEvent;
+
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
 
         #endregion
 
@@ -133,12 +151,11 @@
                 ftpWebResponseArray = ftpWebResponseString.ToString().Split('\n');
             }
 
-            return ParseAndExtract(ftpWebResponseArray, directoryPath);
+            return ParseAndExtractDirectoryListing(ftpWebResponseArray, directoryPath);
         }
 
-        private static IEnumerable<FtpEntry> ParseAndExtract(string[] lines, string directoryPathInital)
+        private IEnumerable<FtpEntry> ParseAndExtractDirectoryListing(string[] lines, string directoryPathInital)
         {
-
             foreach (var line in lines)
             {
                 Match split = GetMatchingRegex(line);
@@ -155,9 +172,10 @@
                 //var time = split.Groups["time"].ToString();
                 //var day = split.Groups["day"].ToString();
                 DateTime dateTime;
+                string dateTimeString = "";
                 try
                 {
-                    string dateTimeString = split.Groups["timestamp"].Value;
+                    dateTimeString = split.Groups["timestamp"].Value;
                     Console.WriteLine("Date from Ftp Server: " + dateTimeString);
                     if (dateTimeString.Substring(3, 1) == " ") // "Dec 19 15:44"
                     {
@@ -178,6 +196,7 @@
                 }
                 catch (Exception ex)
                 {
+                    FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not parse date: [{0}].", dateTimeString), ex));
                     dateTime = Convert.ToDateTime(null);
                 }
 
@@ -220,48 +239,52 @@
 
         #region Directory Create, Delete
 
-        public bool CreateDirectory(string dirpath)
+        public bool CreateDirectory(string directoryPath)
         {
             //perform create
-            string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(dirpath);
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(directoryPath);
+            System.Net.FtpWebRequest ftp = GetRequest(uri);
             //Set request to MkDir
             ftp.Method = System.Net.WebRequestMethods.Ftp.MakeDirectory;
             try
             {
                 //get response but ignore it
                 string str = GetStringResponse(ftp);
+                FtpServiceEvent(this, FtpServiceEventArgs.DirectoryCreate(directoryPath));
             }
             catch (Exception ex)
             {
+                FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not create directory: [{0}].", directoryPath), ex));
                 return false;
             }
             return true;
         }
 
-        public bool DeleteDirectory(string dirpath)
+        public bool DeleteDirectory(string directoryPath)
         {
             //perform remove
-            string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(dirpath);
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(directoryPath);
+            System.Net.FtpWebRequest ftp = GetRequest(uri);
             //Set request to RmDir
             ftp.Method = System.Net.WebRequestMethods.Ftp.RemoveDirectory;
             try
             {
                 //get response but ignore it
                 string str = GetStringResponse(ftp);
+                FtpServiceEvent(this, FtpServiceEventArgs.DirectoryDelete(directoryPath));
             }
             catch (Exception ex)
             {
+                FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not delete directory: [{0}].", directoryPath), ex));
                 return false;
             }
             return true;
         }
 
-        public bool DeleteDirectoryRecursive(string dirpath)
+        public bool DeleteDirectoryRecursive(string directoryPath)
         {
             // Delete all entries within the diretory
-            List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(dirpath);
+            List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(directoryPath);
 
             foreach (var ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
             {
@@ -278,66 +301,36 @@
             }
 
             // Delete the directory requested
-            return DeleteDirectory(dirpath);
-        }
-
-        /// <summary>
-        /// Obtains a response stream as a string
-        /// </summary>
-        /// <param name="ftp">current FTP request</param>
-        /// <returns>String containing response</returns>
-        /// <remarks>FTP servers typically return strings with CR and not CRLF. Use respons.Replace(vbCR, vbCRLF) to convert to an MSDOS string</remarks>
-        private string GetStringResponse(FtpWebRequest ftp)
-        {
-            //Get the result, streaming to a string
-            string result = "";
-            using (FtpWebResponse response = (FtpWebResponse)ftp.GetResponse())
-            {
-                long size = response.ContentLength;
-                using (Stream datastream = response.GetResponseStream())
-                {
-                    using (StreamReader sr = new StreamReader(datastream))
-                    {
-                        result = sr.ReadToEnd();
-                        sr.Close();
-                    }
-
-                    datastream.Close();
-                }
-
-                response.Close();
-            }
-
-            return result;
+            return DeleteDirectory(directoryPath);
         }
 
         #endregion
 
         #region File Download
 
-        public bool DownloadFile(string sourceFilename, string targetFilename, bool permitOverwrite, DateTime? setDateTimeForFile = null)
+        public bool DownloadFile(string filePathSource, string filePathTarget, bool overrideExisting, DateTime? setDateTimeForFile = null)
         {
-            FileInfo fi = new FileInfo(targetFilename);
-            return this.FileDownload(sourceFilename, fi, permitOverwrite, setDateTimeForFile);
+            FileInfo fi = new FileInfo(filePathTarget);
+            return this.DownloadFile(filePathSource, fi, overrideExisting, setDateTimeForFile);
         }
 
-        public bool DownloadFileRecursive(string sourceStartingPath, string targetStartingPath, bool overrideExisting = false, bool deleteSourceAfterDownload = false)
+        public bool DownloadFileRecursive(string startingPathSource, string startingPathTarget, bool overrideExisting = false, bool deleteSourceAfterDownload = false)
         {
-            List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(sourceStartingPath);
+            List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(startingPathSource);
 
-            System.IO.Directory.CreateDirectory(targetStartingPath);
+            System.IO.Directory.CreateDirectory(startingPathTarget);
 
             // Copy all Files
             foreach (var ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
             {
                 // Build target path
                 string x1 = ftpEntry.DirectoryPath;
-                if (!string.IsNullOrWhiteSpace(sourceStartingPath))
+                if (!string.IsNullOrWhiteSpace(startingPathSource))
                 {
-                    x1 = ftpEntry.DirectoryPath.Replace(sourceStartingPath, "");
+                    x1 = ftpEntry.DirectoryPath.Replace(startingPathSource, "");
                 }
 
-                string targetFilePath = targetStartingPath + x1.Replace("/", @"\");
+                string targetFilePath = startingPathTarget + x1.Replace("/", @"\");
 
                 string targetPath;
                 if (ftpEntry.FtpEntryType == FtpEntryType.File)
@@ -349,7 +342,7 @@
                     targetPath = targetFilePath;
                 }
 
-                if (AddSuffix(targetStartingPath, @"\") != AddSuffix(targetPath, @"\"))
+                if (AddSuffix(startingPathTarget, @"\") != AddSuffix(targetPath, @"\"))
                 {
                     DirectoryInfo directoryCreated = Directory.CreateDirectory(targetPath);
                     directoryCreated.CreationTime = ftpEntry.DateTime;
@@ -386,29 +379,29 @@
             return true;
         }
 
-        private bool FileDownload(string sourceFilename, FileInfo targetFI, bool permitOverwrite, DateTime? setDateTimeForFile = null)
+        private bool DownloadFile(string filePathSource, FileInfo fileInfoTarget, bool overrideExisting, DateTime? setDateTimeForFile = null)
         {
             //1. check target
-            if (targetFI.Exists && !(permitOverwrite))
+            if (fileInfoTarget.Exists && !(overrideExisting))
             {
                 throw (new ApplicationException("Target file already exists"));
             }
 
             //2. check source
             string source;
-            if (sourceFilename.Trim() == "")
+            if (filePathSource.Trim() == "")
             {
                 throw (new ApplicationException("File not specified"));
             }
-            else if (sourceFilename.Contains("/"))
+            else if (filePathSource.Contains("/"))
             {
                 //treat as a full path
-                source = AdjustDir(sourceFilename);
+                source = AdjustDir(filePathSource);
             }
             else
             {
                 //treat as filename only, use current directory
-                source = sourceFilename;
+                source = filePathSource;
             }
 
             string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + source;
@@ -426,7 +419,7 @@
                 using (Stream responseStream = response.GetResponseStream())
                 {
                     //loop to read & write to file
-                    using (FileStream fs = targetFI.OpenWrite())
+                    using (FileStream fs = fileInfoTarget.OpenWrite())
                     {
                         try
                         {
@@ -441,13 +434,14 @@
                             fs.Flush();
                             fs.Close();
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
+                            FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not download file: [{0}] to file [{1}].", filePathSource, fileInfoTarget), ex));
                             //catch error and delete file only partially downloaded
                             fs.Close();
                             //delete target file as it's incomplete
-                            targetFI.Delete();
-                            throw;
+                            fileInfoTarget.Delete();
+                            return false;
                         }
                     }
 
@@ -455,12 +449,13 @@
                 }
 
                 response.Close();
+                FtpServiceEvent(this, FtpServiceEventArgs.FileDownload(filePathSource, fileInfoTarget.FullName));
             }
 
             if (setDateTimeForFile != null)
             {
-                targetFI.CreationTime = setDateTimeForFile.Value;
-                targetFI.LastWriteTime = setDateTimeForFile.Value;
+                fileInfoTarget.CreationTime = setDateTimeForFile.Value;
+                fileInfoTarget.LastWriteTime = setDateTimeForFile.Value;
             }
 
             return true;
@@ -473,50 +468,50 @@
         /// <summary>
         /// Copy a local file to the FTP server
         /// </summary>
-        /// <param name="localFilename">Full path of the local file</param>
-        /// <param name="targetFilename">Target filename, if required</param>
+        /// <param name="filePathSource">Full path of the local file</param>
+        /// <param name="filePathTarget">Target filename, if required</param>
         /// <returns></returns>
         /// <remarks>If the target filename is blank, the source filename is used
         /// (assumes current directory). Otherwise use a filename to specify a name
         /// or a full path and filename if required.</remarks>
-        public bool UploadFile(string localFilename, string targetFilename)
+        public bool UploadFile(string filePathSource, string filePathTarget)
         {
             //1. check source
-            if (!File.Exists(localFilename))
+            if (!File.Exists(filePathSource))
             {
-                throw (new ApplicationException("File " + localFilename + " not found"));
+                throw (new ApplicationException("File " + filePathSource + " not found"));
             }
             //copy to FI
-            FileInfo fi = new FileInfo(localFilename);
-            return UploadFile(fi, targetFilename);
+            FileInfo fi = new FileInfo(filePathSource);
+            return UploadFile(fi, filePathTarget);
         }
 
         /// <summary>
         /// Upload a local file to the FTP server
         /// </summary>
-        /// <param name="fi">Source file</param>
-        /// <param name="targetFilename">Target filename (optional)</param>
+        /// <param name="fileInfoSource">Source file</param>
+        /// <param name="filePathTarget">Target filename (optional)</param>
         /// <returns></returns>
-        private bool UploadFile(FileInfo fi, string targetFilename)
+        private bool UploadFile(FileInfo fileInfoSource, string filePathTarget)
         {
             //copy the file specified to target file: target file can be full path or just filename (uses current dir)
 
             //1. check target
             string target;
-            if (targetFilename.Trim() == "")
+            if (filePathTarget.Trim() == "")
             {
                 //Blank target: use source filename & current dir
-                target = fi.Name;
+                target = fileInfoSource.Name;
             }
-            else if (targetFilename.Contains("/"))
+            else if (filePathTarget.Contains("/"))
             {
                 //If contains / treat as a full path
-                target = AdjustDir(targetFilename);
+                target = AdjustDir(filePathTarget);
             }
             else
             {
                 //otherwise treat as filename only, use current directory
-                target = targetFilename;
+                target = filePathTarget;
             }
 
             string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + target;
@@ -529,7 +524,7 @@
             ftp.UseBinary = true;
 
             //Notify FTP of the expected size
-            ftp.ContentLength = fi.Length;
+            ftp.ContentLength = fileInfoSource.Length;
 
             //create byte array to store: ensure at least 1 byte!
             const int BufferSize = 2048;
@@ -537,7 +532,7 @@
             int dataRead;
 
             //open file for reading
-            using (FileStream fs = fi.OpenRead())
+            using (FileStream fs = fileInfoSource.OpenRead())
             {
                 try
                 {
@@ -555,12 +550,14 @@
                 }
                 catch (Exception ex)
                 {
+                    FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not upload file: [{0}] to file [{1}].", fileInfoSource.FullName, filePathTarget), ex));
                     return false;
                 }
                 finally
                 {
                     //ensure file closed
                     fs.Close();
+                    FtpServiceEvent(this, FtpServiceEventArgs.FileUpload(fileInfoSource.FullName, filePathTarget));
                 }
 
             }
@@ -578,32 +575,65 @@
         /// <summary>
         /// Delete remote file
         /// </summary>
-        /// <param name="filename">filename or full path</param>
+        /// <param name="filePath">filename or full path</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool DeleteFile(string filename)
+        public bool DeleteFile(string filePath)
         {
             //Determine if file or full path
-            string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + GetFullPath(filename);
+            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + GetFullPath(filePath);
 
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            System.Net.FtpWebRequest ftp = GetRequest(uri);
             //Set request to delete
             ftp.Method = System.Net.WebRequestMethods.Ftp.DeleteFile;
             try
             {
                 //get response but ignore it
                 string str = GetStringResponse(ftp);
+                FtpServiceEvent(this, FtpServiceEventArgs.FileDelete(filePath));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not delete file: [{0}].", filePath), ex));
                 return false;
             }
+
             return true;
         }
 
         #endregion
 
         #region Helper
+
+        /// <summary>
+        /// Obtains a response stream as a string
+        /// </summary>
+        /// <param name="ftp">current FTP request</param>
+        /// <returns>String containing response</returns>
+        /// <remarks>FTP servers typically return strings with CR and not CRLF. Use respons.Replace(vbCR, vbCRLF) to convert to an MSDOS string</remarks>
+        private string GetStringResponse(FtpWebRequest ftp)
+        {
+            //Get the result, streaming to a string
+            string result = "";
+            using (FtpWebResponse response = (FtpWebResponse)ftp.GetResponse())
+            {
+                long size = response.ContentLength;
+                using (Stream datastream = response.GetResponseStream())
+                {
+                    using (StreamReader sr = new StreamReader(datastream))
+                    {
+                        result = sr.ReadToEnd();
+                        sr.Close();
+                    }
+
+                    datastream.Close();
+                }
+
+                response.Close();
+            }
+
+            return result;
+        }
 
         //Get the basic FtpWebRequest object with the
         //common settings and security
@@ -630,9 +660,9 @@
         {
             Regex rx;
             Match m;
-            for (int i = 0; i <= _ParseFormats.Length - 1; i++)
+            for (int i = 0; i <= parseFormats.Length - 1; i++)
             {
-                rx = new Regex(_ParseFormats[i]);
+                rx = new Regex(parseFormats[i]);
                 m = rx.Match(line);
                 if (m.Success)
                 {
