@@ -210,5 +210,38 @@
         }
 
         #endregion
+
+        #region BuildHtmlMessage
+
+        [TestMethod]
+        public void FtpClientService_BuildHtmlMessage_Empty()
+        {
+            // Assign
+            List<FtpServiceEventArgs> input = new List<FtpServiceEventArgs>();
+
+            // Act
+            string result = FtpClientService.BuildHtmlMessage(input);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreNotEqual<int>(0, result.Count());
+        }
+
+        [TestMethod]
+        public void FtpClientService_BuildHtmlMessage_OK_1()
+        {
+            // Assign
+            List<FtpServiceEventArgs> input = new List<FtpServiceEventArgs>();
+            input.Add(FtpServiceEventArgs.FileDownload("fileFrom", "fileTo"));
+
+            // Act
+            string result = FtpClientService.BuildHtmlMessage(input);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreNotEqual<int>(0, result.Count());
+        }
+
+        #endregion
     }
 }

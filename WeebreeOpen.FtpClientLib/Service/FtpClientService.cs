@@ -632,11 +632,13 @@
 
             foreach (var item in ftpServiceEvents.Where(x => x.Type != FtpServiceEventType.Error).OrderBy(x => x.EventOccuredAt))
             {
+                string exception = item.Exception == null ? "" : item.Exception.ToString();
+
                 outputHtml += string.Format("<li>{0} - {1}<br/>From: {2}{3}{4}{5}<br/>To: {6}{7}<br>{8}</li>",
                     item.Type, item.Message,
                     item.Directory, item.File, item.DirectoryFrom, item.FileFrom,
                     item.DirectoryTo, item.FileTo,
-                    item.Exception.ToString());
+                    exception);
             }
             outputHtml += "</ul>";
 

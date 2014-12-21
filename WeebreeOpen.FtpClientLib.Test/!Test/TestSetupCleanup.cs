@@ -44,7 +44,13 @@
             //TestSetupCleanup.CreateTestEnvironment();
         }
 
-        public static void CreateTestEnvironment() {
+        public static void CreateTestEnvironment()
+        {
+            if (TestSetupCleanup.FtpClientConnection == null)
+            {
+                return;
+            }
+
             FtpClientService ftpClientService = new FtpClientService(TestSetupCleanup.FtpClientConnection);
 
             // Delete all
@@ -71,6 +77,11 @@
         [AssemblyCleanup()]
         public static void AssemblyCleanup()
         {
+            if (TestSetupCleanup.FtpClientConnection == null)
+            {
+                return;
+            }
+
             FtpClientService ftpClientService = new FtpClientService(TestSetupCleanup.FtpClientConnection);
             ftpClientService.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
         }
