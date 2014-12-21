@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>WeebreeOpen.GitClientLib</id>
+        <version>0.0.1-beta</version>
+        <authors>Weebree</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>GIT Client based on C#.</description>
+        <releaseNotes>Early preview.</releaseNotes>
+    </metadata>
+    <files>
+        <file src="bin\Release\WeebreeOpen.GitClientLib.dll" target="lib\WeebreeOpen.GitClientLib.dll" />
+    </files>
+</package>
