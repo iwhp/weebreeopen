@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B04990DC-0469-4F00-84BB-F81CC90580CA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WeebreeOpen.ErpLib</RootNamespace>
+    <AssemblyName>WeebreeOpen.ErpLib</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Domain\Base\RecordLogAction.cs" />
+    <Compile Include="Domain\Base\RecordLog.cs" />
+    <Compile Include="Domain\Base\BaseEntity.cs" />
+    <Compile Include="Domain\BusinessTransaction\SalesCreditMemo.cs" />
+    <Compile Include="Domain\BusinessTransaction\SalesRetrunOrder.cs" />
+    <Compile Include="Domain\BusinessTransaction\SalesOrder.cs" />
+    <Compile Include="Domain\BusinessTransaction\SalesQuote.cs" />
+    <Compile Include="Domain\BusinessTransaction\SalesInvoiceLine.cs" />
+    <Compile Include="Domain\BusinessTransaction\SalesInvoice.cs" />
+    <Compile Include="Domain\Communication\City.cs" />
+    <Compile Include="Domain\Communication\Region.cs" />
+    <Compile Include="Domain\Communication\Country.cs" />
+    <Compile Include="Domain\Communication\Location.cs" />
+    <Compile Include="Domain\Common\BusinessPartyLocation.cs" />
+    <Compile Include="Domain\Common\BusinessPartyCategory.cs" />
+    <Compile Include="Domain\Common\BusinessParty_Employee.cs" />
+    <Compile Include="Domain\Common\BusinessParty_Vendor.cs" />
+    <Compile Include="Domain\Common\BusinessParty_Customer.cs" />
+    <Compile Include="Domain\Common\BusinessParty.cs" />
+    <Compile Include="Domain\Item.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Application\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="!Readme.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

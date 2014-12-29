@@ -46,6 +46,7 @@
         {
             FtpServiceEventArgs e = new FtpServiceEventArgs();
             e.Type = FtpServiceEventType.Error;
+            e.Message += message;
             e.Message += string.IsNullOrWhiteSpace(message) ? "" : " ";
             e.Message += string.Format("Exception: {0}", exception.Message);
             e.EventOccuredAt = DateTime.Now;
