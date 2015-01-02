@@ -30,8 +30,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -39,33 +47,91 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Domain\Base\RecordLogAction.cs" />
-    <Compile Include="Domain\Base\RecordLog.cs" />
-    <Compile Include="Domain\Base\BaseEntity.cs" />
-    <Compile Include="Domain\BusinessTransaction\SalesCreditMemo.cs" />
-    <Compile Include="Domain\BusinessTransaction\SalesRetrunOrder.cs" />
-    <Compile Include="Domain\BusinessTransaction\SalesOrder.cs" />
-    <Compile Include="Domain\BusinessTransaction\SalesQuote.cs" />
-    <Compile Include="Domain\BusinessTransaction\SalesInvoiceLine.cs" />
-    <Compile Include="Domain\BusinessTransaction\SalesInvoice.cs" />
-    <Compile Include="Domain\Communication\City.cs" />
-    <Compile Include="Domain\Communication\Region.cs" />
-    <Compile Include="Domain\Communication\Country.cs" />
-    <Compile Include="Domain\Communication\Location.cs" />
-    <Compile Include="Domain\Common\BusinessPartyLocation.cs" />
-    <Compile Include="Domain\Common\BusinessPartyCategory.cs" />
-    <Compile Include="Domain\Common\BusinessParty_Employee.cs" />
-    <Compile Include="Domain\Common\BusinessParty_Vendor.cs" />
-    <Compile Include="Domain\Common\BusinessParty_Customer.cs" />
-    <Compile Include="Domain\Common\BusinessParty.cs" />
-    <Compile Include="Domain\Item.cs" />
+    <Compile Include="Application\Service\CustomerService.cs" />
+    <Compile Include="Domain\Model\Base\StreetAddress.cs" />
+    <Compile Include="Domain\Model\Base\Tax.cs" />
+    <Compile Include="Domain\Model\Base\UnitOfMeasure.cs" />
+    <Compile Include="Domain\Model\Base\CurrencyExchangeRate.cs" />
+    <Compile Include="Domain\Model\Base\Currency.cs" />
+    <Compile Include="Domain\Model\Base\Language.cs" />
+    <Compile Include="Domain\Model\Base\Translation.cs" />
+    <Compile Include="Domain\Model\Base\TaxRate.cs" />
+    <Compile Include="Domain\Model\Tenant\BusinessTransaction\TransactionLine.cs" />
+    <Compile Include="Domain\Model\Tenant\BusinessTransaction\Transaction.cs" />
+    <Compile Include="Domain\Model\Tenant\BusinessTransaction\ShippingLine.cs" />
+    <Compile Include="Domain\Model\Tenant\BusinessTransaction\Shipping.cs" />
+    <Compile Include="Domain\Model\Tenant\BusinessTransaction\OrderLine.cs" />
+    <Compile Include="Domain\Model\Tenant\BusinessTransaction\Order.cs" />
+    <Compile Include="Domain\Model\Tenant\Product\ItemPrice.cs" />
+    <Compile Include="Domain\Model\Tenant\Product\ItemPricePurchase.cs" />
+    <Compile Include="Domain\Model\Tenant\Product\ItemPriceSale.cs" />
+    <Compile Include="Domain\Model\Tenant\Product\Item.cs" />
+    <Compile Include="Domain\Specification\BusinessPartySpecs\RuleIsOrganisationOrIsPerson.cs" />
+    <Compile Include="Domain\Specification\BusinessPartySpecs\RuleIsOrganisationTrue.cs" />
+    <Compile Include="Domain\Specification\BusinessPartySpecs\RuleIsPersonTrue.cs" />
+    <Compile Include="Domain\Specification\LocationSpecs\RuleNameNotEmpty.cs" />
+    <Compile Include="Domain\Validation\LocationValidator.cs" />
+    <Compile Include="ErpLibResource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ErpLibResource.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Practices\BaseEntity.cs" />
+    <Compile Include="Domain\Model\Base\Tenant.cs" />
+    <Compile Include="Practices\BaseEntityTenant.cs" />
+    <Compile Include="Domain\Model\Base\RecordLog.cs" />
+    <Compile Include="Domain\Model\Base\RecordLogAction.cs" />
+    <Compile Include="Domain\Model\Base\City.cs" />
+    <Compile Include="Domain\Model\Base\Country.cs" />
+    <Compile Include="Domain\Model\Base\Region.cs" />
+    <Compile Include="Domain\Model\Tenant\Party\BusinessPartyVendor.cs" />
+    <Compile Include="Domain\Model\Tenant\Party\BusinessPartyEmployee.cs" />
+    <Compile Include="Domain\Model\Tenant\Party\LocationBusinessParty.cs" />
+    <Compile Include="Domain\Model\Tenant\Party\Location.cs" />
+    <Compile Include="Domain\Model\Tenant\Party\BusinessParty.cs" />
+    <Compile Include="Domain\Model\Tenant\Party\BusinessPartyCustomer.cs" />
+    <Compile Include="Domain\Model\Tenant\Wine\WineStore.cs" />
+    <Compile Include="Domain\Model\Tenant\Wine\Wine.cs" />
+    <Compile Include="Infractructure\MsSql\ErpDbContext.cs" />
+    <Compile Include="Practices\BaseRepository.cs" />
+    <Compile Include="Practices\BaseUnitOfWork.cs" />
+    <Compile Include="Practices\BaseDbContext.cs" />
+    <Compile Include="Practices\Specification.cs" />
+    <Compile Include="Practices\SpecificationRule.cs" />
+    <Compile Include="Domain\Specification\BusinessPartySpecs\ByAssignedUser.cs" />
+    <Compile Include="Domain\Specification\BusinessPartySpecs\ConsistencyCompanyId.cs" />
+    <Compile Include="Domain\Specification\BusinessPartySpecs\DependencyCompany.cs" />
+    <Compile Include="Domain\Specification\BusinessPartySpecs\RuleNameNotEmpty.cs" />
+    <Compile Include="Domain\Validation\BusinessPartyCustomerValidator.cs" />
+    <Compile Include="Practices\Validator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Application\" />
+    <Folder Include="Domain\ModelView\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="!Readme.txt" />
+    <Content Include="Practices\!Readme.txt" />
+    <Content Include="Domain\Model\Tenant\Wine\!Readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ErpLibResource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ErpLibResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
