@@ -196,7 +196,7 @@
                 }
                 catch (Exception ex)
                 {
-                    FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not parse date: [{0}].", dateTimeString), ex));
+                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not parse date: [{0}].", dateTimeString), ex));
                     dateTime = Convert.ToDateTime(null);
                 }
 
@@ -250,11 +250,11 @@
             {
                 //get response but ignore it
                 string str = GetStringResponse(ftp);
-                FtpServiceEvent(this, FtpServiceEventArgs.DirectoryCreate(directoryPath));
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.DirectoryCreate(directoryPath));
             }
             catch (Exception ex)
             {
-                FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not create directory: [{0}].", directoryPath), ex));
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not create directory: [{0}].", directoryPath), ex));
                 return false;
             }
             return true;
@@ -271,11 +271,11 @@
             {
                 //get response but ignore it
                 string str = GetStringResponse(ftp);
-                FtpServiceEvent(this, FtpServiceEventArgs.DirectoryDelete(directoryPath));
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.DirectoryDelete(directoryPath));
             }
             catch (Exception ex)
             {
-                FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not delete directory: [{0}].", directoryPath), ex));
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not delete directory: [{0}].", directoryPath), ex));
                 return false;
             }
             return true;
@@ -436,7 +436,7 @@
                         }
                         catch (Exception ex)
                         {
-                            FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not download file: [{0}] to file [{1}].", filePathSource, fileInfoTarget), ex));
+                            OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not download file: [{0}] to file [{1}].", filePathSource, fileInfoTarget), ex));
                             //catch error and delete file only partially downloaded
                             fs.Close();
                             //delete target file as it's incomplete
@@ -449,7 +449,7 @@
                 }
 
                 response.Close();
-                FtpServiceEvent(this, FtpServiceEventArgs.FileDownload(filePathSource, fileInfoTarget.FullName));
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.FileDownload(filePathSource, fileInfoTarget.FullName));
             }
 
             if (setDateTimeForFile != null)
@@ -550,14 +550,14 @@
                 }
                 catch (Exception ex)
                 {
-                    FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not upload file: [{0}] to file [{1}].", fileInfoSource.FullName, filePathTarget), ex));
+                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not upload file: [{0}] to file [{1}].", fileInfoSource.FullName, filePathTarget), ex));
                     return false;
                 }
                 finally
                 {
                     //ensure file closed
                     fs.Close();
-                    FtpServiceEvent(this, FtpServiceEventArgs.FileUpload(fileInfoSource.FullName, filePathTarget));
+                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.FileUpload(fileInfoSource.FullName, filePathTarget));
                 }
 
             }
@@ -590,11 +590,11 @@
             {
                 //get response but ignore it
                 string str = GetStringResponse(ftp);
-                FtpServiceEvent(this, FtpServiceEventArgs.FileDelete(filePath));
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.FileDelete(filePath));
             }
             catch (Exception ex)
             {
-                FtpServiceEvent(this, FtpServiceEventArgs.Error(string.Format("Could not delete file: [{0}].", filePath), ex));
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not delete file: [{0}].", filePath), ex));
                 return false;
             }
 
