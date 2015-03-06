@@ -113,6 +113,7 @@
             FtpServiceEventArgs e = new FtpServiceEventArgs();
             e.Type = FtpServiceEventType.FileUpload;
             e.Message = message;
+            e.EventOccuredAt = DateTime.Now;
             e.FileFrom = fileFrom;
             e.FileTo = fileTo;
             return e;
@@ -123,6 +124,7 @@
             FtpServiceEventArgs e = new FtpServiceEventArgs();
             e.Type = FtpServiceEventType.FileDelete;
             e.Message = message;
+            e.EventOccuredAt = DateTime.Now;
             e.File = file;
             return e;
         }

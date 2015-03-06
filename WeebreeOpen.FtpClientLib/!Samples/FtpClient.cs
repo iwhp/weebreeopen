@@ -462,8 +462,8 @@ namespace FTP
         public bool FtpDeleteDirectory(string dirpath)
         {
             //perform remove
-            string URI = this.Hostname + AdjustDir(dirpath);
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            string uri = this.Hostname + AdjustDir(dirpath);
+            System.Net.FtpWebRequest ftp = GetRequest(uri);
             //Set request to RmDir
             ftp.Method = System.Net.WebRequestMethods.Ftp.RemoveDirectory;
             try

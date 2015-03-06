@@ -373,11 +373,22 @@
                         if (ftpEntry.FtpEntryType == FtpEntryType.File)
                         {
                             bool isFileDeleteOK = DeleteFile(ftpEntry.DirectoryPath);
-                            if (!isFileDeleteOK) { return false; }
+                            if (!isFileDeleteOK)
+                            {
+                                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("During coping file could not delete file: [{0}].", ftpEntry.DirectoryPath)));
+                                return false;
+                            }
                         }
-
-                        // Delete Directory (if not empty, it will not be deleted (return code = false))
-                        bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.DirectoryPath);
+                        else
+                        {
+                            // Delete Directory (if not empty, it will not be deleted (return code = false))
+                            bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.DirectoryPath);
+                            if (!isDirectoryDeleteOK)
+                            {
+                                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("During coping file could not delete directory (direcctory no empty?): [{0}].", ftpEntry.DirectoryPath)));
+                                return false;
+                            }
+                        }
                     }
                 }
                 else
