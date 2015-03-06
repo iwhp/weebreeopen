@@ -15,7 +15,13 @@
     {
         #region Constructors
 
+        private FtpClientService()
+        {
+            this.EventMessages = new List<FtpServiceEventArgs>();
+        }
+
         public FtpClientService(string serverNameOrIp, string userName, string password)
+            : this()
         {
             if (serverNameOrIp == null) { throw new ArgumentNullException("serverNameOrIp"); }
             if (userName == null) { throw new ArgumentNullException("userName"); }
@@ -25,6 +31,7 @@
         }
 
         public FtpClientService(FtpClientConnection connection)
+            : this()
         {
             if (connection == null) { throw new ArgumentNullException("connection"); }
 
@@ -34,6 +41,8 @@
         #endregion
 
         #region Properties
+
+        public List<FtpServiceEventArgs> EventMessages { get; set; }
 
         public FtpClientConnection FtpClientConnection { get; private set; }
 
@@ -82,6 +91,7 @@
 
         protected virtual void OnRaiseFtpServiceEvent(FtpServiceEventArgs e)
         {
+            this.EventMessages.Add(e);
             EventHandler<FtpServiceEventArgs> handler = FtpServiceEvent;
 
             if (handler != null)
@@ -176,7 +186,6 @@
                 try
                 {
                     dateTimeString = split.Groups["timestamp"].Value;
-                    Console.WriteLine("Date from Ftp Server: " + dateTimeString);
                     if (dateTimeString.Substring(3, 1) == " ") // "Dec 19 15:44"
                     {
                         if (dateTimeString.Length == 12)
@@ -193,6 +202,7 @@
                     {
                         dateTime = DateTime.Parse(split.Groups["timestamp"].Value, new CultureInfo("en-US"));
                     }
+                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Information("Date from Ftp Server: " + dateTimeString + " converted to: " + dateTime));
                 }
                 catch (Exception ex)
                 {
@@ -681,10 +691,10 @@
 
         //Get the basic FtpWebRequest object with the
         //common settings and security
-        private FtpWebRequest GetRequest(string URI)
+        private FtpWebRequest GetRequest(string uri)
         {
             //create request
-            FtpWebRequest result = (FtpWebRequest)FtpWebRequest.Create(URI);
+            FtpWebRequest result = (FtpWebRequest)FtpWebRequest.Create(uri);
             //Set the login details
             result.Credentials = GetCredentials();
             //Do not keep alive (stateless mode)

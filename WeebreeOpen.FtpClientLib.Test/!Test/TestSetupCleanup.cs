@@ -1,10 +1,8 @@
 ﻿namespace WeebreeOpen.FtpClientLib.Test.Test
 {
     using System;
-    using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using WeebreeOpen.FtpClientLib.Model;
     using WeebreeOpen.FtpClientLib.Service;
@@ -20,7 +18,7 @@
         public static string TestDataFileText1 = @"!Test\Data\testfile1-text.txt";
         public static string TestDataFileBinary1 = @"!Test\Data\testfile2-image.jpg";
 
-        public static string FtpTestRootFolder = "WeebreeOpenTest/";    // if filled, end with a slash (/)
+        public static string FtpTestRootFolder = "BVDWeb/WeebreeOpenTest/";    // if filled, end with a slash (/)
         public static string FtpFileText1 = TestSetupCleanup.FtpTestRootFolder + "FtpToFileText1.txt";
         public static string FtpFileBinary1 = TestSetupCleanup.FtpTestRootFolder + "FtpToFileBinary1.jpg";
         public static string FtpDirectory1 = TestSetupCleanup.FtpTestRootFolder + "TestDir1/";
@@ -40,8 +38,8 @@
         [AssemblyInitialize]
         public static void AssemblyInit(TestContext context)
         {
-            //TestSetupCleanup.FtpClientConnection = new FtpClientConnection("ftp-server", @"username", "password");
-            //TestSetupCleanup.CreateTestEnvironment();
+            TestSetupCleanup.FtpClientConnection = new FtpClientConnection("xxx", @"xxx", "xxx");
+            TestSetupCleanup.CreateTestEnvironment();
         }
 
         public static void CreateTestEnvironment()
@@ -50,6 +48,14 @@
             {
                 return;
             }
+
+            if (Directory.Exists(TestSetupCleanup.LocalTestRootFolder))
+            {
+                Directory.Delete(TestSetupCleanup.LocalTestRootFolder, true);
+            }
+            Directory.CreateDirectory(TestSetupCleanup.LocalTestRootFolder);
+            File.Copy(TestSetupCleanup.TestDataFileText1, TestSetupCleanup.LocalFileText1);
+            File.Copy(TestSetupCleanup.TestDataFileBinary1, TestSetupCleanup.LocalFileBinary1);
 
             FtpClientService ftpClientService = new FtpClientService(TestSetupCleanup.FtpClientConnection);
 
@@ -81,6 +87,8 @@
             {
                 return;
             }
+
+            Directory.Delete(TestSetupCleanup.LocalTestRootFolder, true);
 
             FtpClientService ftpClientService = new FtpClientService(TestSetupCleanup.FtpClientConnection);
             ftpClientService.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);

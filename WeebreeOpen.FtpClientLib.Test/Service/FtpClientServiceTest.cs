@@ -155,9 +155,6 @@
 
             // Assert
             Assert.AreEqual<bool>(true, result);
-
-            // Reset Test Environment
-            TestSetupCleanup.CreateTestEnvironment();
         }
 
         [TestMethod]
@@ -174,9 +171,6 @@
 
             // Assert
             Assert.AreEqual<bool>(true, result);
-
-            // Reset Test Environment
-            TestSetupCleanup.CreateTestEnvironment();
         }
 
         #endregion
@@ -192,6 +186,7 @@
             sut.CreateDirectory(TestSetupCleanup.FtpTestRootFolder);
 
             // Act
+            sut.EventMessages.Clear();
             bool result1 = sut.CreateDirectory(TestSetupCleanup.FtpDirectory1);
             bool result2 = sut.UploadFile(TestSetupCleanup.LocalFileText1, TestSetupCleanup.FtpFileText3);
             bool result3 = sut.DeleteDirectory(TestSetupCleanup.FtpDirectory1);
@@ -205,8 +200,11 @@
             Assert.AreEqual<bool>(true, result4, "File could not be deleted.");
             Assert.AreEqual<bool>(true, result5, "Directory could not be deleted");
 
-            // Reset Test Environment
-            TestSetupCleanup.CreateTestEnvironment();
+            // Log
+            foreach (var message in sut.EventMessages)
+            {
+                Console.WriteLine(message.ToString());
+            }
         }
 
         #endregion

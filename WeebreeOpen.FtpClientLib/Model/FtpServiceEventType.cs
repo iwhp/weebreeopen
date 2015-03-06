@@ -5,6 +5,7 @@
 
     public enum FtpServiceEventType
     {
+        Information,
         Error,
 
         DirectoryCreate,
