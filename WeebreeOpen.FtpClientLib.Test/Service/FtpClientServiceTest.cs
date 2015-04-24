@@ -212,6 +212,17 @@
         #region BuildHtmlMessage
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void FtpClientService_BuildHtmlMessage_Null()
+        {
+            // Assign
+            List<FtpServiceEventArgs> input = null;
+
+            // Act
+            FtpClientService.BuildHtmlMessage(input);
+        }
+
+        [TestMethod]
         public void FtpClientService_BuildHtmlMessage_Empty()
         {
             // Assign
@@ -230,7 +241,14 @@
         {
             // Assign
             List<FtpServiceEventArgs> input = new List<FtpServiceEventArgs>();
-            input.Add(FtpServiceEventArgs.FileDownload("fileFrom", "fileTo"));
+            input.Add(FtpServiceEventArgs.Information("message"));
+            input.Add(FtpServiceEventArgs.DirectoryCreate("directory", "message"));
+            input.Add(FtpServiceEventArgs.DirectoryDelete("directory", "message"));
+            input.Add(FtpServiceEventArgs.Error("message", new Exception("exception")));
+            input.Add(FtpServiceEventArgs.FileDelete("file", "message"));
+            input.Add(FtpServiceEventArgs.FileDownload("fileFrom", "fileTO", "message"));
+            input.Add(FtpServiceEventArgs.FileUpload("fileFrom","fileTo","message"));
+            input.Add(FtpServiceEventArgs.Information("message"));
 
             // Act
             string result = FtpClientService.BuildHtmlMessage(input);

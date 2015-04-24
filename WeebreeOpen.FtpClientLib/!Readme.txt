@@ -1,10 +1,18 @@
 ﻿============================================================================================================
 DEPLOYMENT (NUGET PACKAGE)
 ------------------------------------------------------------------------------------------------------------
-> DEPLOY FROM 
-    D:\!Data\Source\Git.Github\iwhp\weebreeopen\WeebreeOpen.FtpClientLib\!!Out-NuGet
-  TO:
-    https://www.nuget.org/packages/WeebreeOpen.FtpClientLib
+PREPARE NUGET:
+> Download NuGet.exe from nuget.com
+> Copy NuGet.exe to C:\!App\NuGet
+> Register NuGet API-KEY (get the API key from nuget.com)
+  nuget setApiKey 1a88b9ad-e068-4f5d-a81c-4f9819a9a35e
+------------------------------------------------------------------------------------------------------------
+PUSH BY COMMAND TO nuget.com
+> C:\!App\NuGet\nuget push C:\!Data\Code\Git.Github\iwhp\weebreeopen\WeebreeOpen.FtpClientLib\!!Out-NuGet\WeebreeOpen.FtpClientLib.0.0.17-beta.nupkg
+------------------------------------------------------------------------------------------------------------
+DEPLOY BY COMMAND FROM
+> https://www.nuget.org/packages/WeebreeOpen.FtpClientLib
+  C:\!Data\Code\Git.Github\iwhp\weebreeopen\WeebreeOpen.FtpClientLib\!!Out-NuGet
 ============================================================================================================
 
 ============================================================================================================

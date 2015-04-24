@@ -8,7 +8,6 @@
     using System.Net;
     using System.Text;
     using System.Text.RegularExpressions;
-    using System.Threading.Tasks;
     using WeebreeOpen.FtpClientLib.Model;
 
     public class FtpClientService
@@ -628,6 +627,11 @@
 
         public static string BuildHtmlMessage(List<FtpServiceEventArgs> ftpServiceEvents)
         {
+            if (ftpServiceEvents == null)
+            {
+                throw new ArgumentNullException("ftpServiceEvents");
+            }
+
             string outputHtml = "";
 
             // Handle errors
@@ -637,31 +641,38 @@
 
             foreach (var item in ftpServiceEvents.Where(x => x.Type == FtpServiceEventType.Error).OrderBy(x => x.EventOccuredAt))
             {
-                outputHtml += string.Format("<li>{0} - {1}<br/>From: {2}{3}{4}{5}<br/>To: {6}{7}<br>{8}</li>",
-                    item.Type, item.Message,
-                    item.Directory, item.File, item.DirectoryFrom, item.FileFrom,
-                    item.DirectoryTo, item.FileTo,
-                    item.Exception.ToString());
+                outputHtml = FormatHtmlOutputForItem(outputHtml, item);
             }
 
             outputHtml += "</ul>";
 
             // Handle all others
             outputHtml += "<h1>FTP SERVICE ACTIONS</h1>";
-            outputHtml += string.Format("<p>Number of Actions: {0}", ftpServiceEvents.Where(x => x.Type != FtpServiceEventType.Error).Count());
+            outputHtml += string.Format("<p>Number of Actions: {0}</p>", ftpServiceEvents.Where(x => x.Type != FtpServiceEventType.Error).Count());
             outputHtml += "<ul>";
 
             foreach (var item in ftpServiceEvents.Where(x => x.Type != FtpServiceEventType.Error).OrderBy(x => x.EventOccuredAt))
             {
-                string exception = item.Exception == null ? "" : item.Exception.ToString();
-
-                outputHtml += string.Format("<li>{0} - {1}<br/>From: {2}{3}{4}{5}<br/>To: {6}{7}<br>{8}</li>",
-                    item.Type, item.Message,
-                    item.Directory, item.File, item.DirectoryFrom, item.FileFrom,
-                    item.DirectoryTo, item.FileTo,
-                    exception);
+                outputHtml = FormatHtmlOutputForItem(outputHtml, item);
             }
             outputHtml += "</ul>";
+
+            return outputHtml;
+        }
+
+        private static string FormatHtmlOutputForItem(string outputHtml, FtpServiceEventArgs item)
+        {
+            string exception = item.Exception == null ? "" : item.Exception.ToString();
+
+            outputHtml += string.Format("<li>{0} - {1}<br/>From: {2}{3}{4}{5}<br/>To: {6}{7}<br/>Exception: {8}<br/></li>",
+                item.Type, item.Message,
+                item.Directory, item.File, item.DirectoryFrom, item.FileFrom,
+                item.DirectoryTo, item.FileTo,
+                exception);
+
+            outputHtml = outputHtml.Replace("From: <br/>", "");
+            outputHtml = outputHtml.Replace("To: <br/>", "");
+            outputHtml = outputHtml.Replace("Exception: <br/>", "");
 
             return outputHtml;
         }
