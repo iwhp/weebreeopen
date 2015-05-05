@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.FtpClientLib", "WeebreeOpen.FtpClientLib\WeebreeOpen.FtpClientLib.csproj", "{B08DF973-B9FC-4E92-BA14-24D5B1AF8677}"
 EndProject
@@ -24,7 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ftp", "Ftp", "{44E924F2-7C1
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{4E19B2D1-F3B0-4905-B398-EF7DBBBD51F9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Office365", "Office365", "{B79C7B25-8B65-4BEA-B7A5-5095622BEAFE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Office", "Office", "{B79C7B25-8B65-4BEA-B7A5-5095622BEAFE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.GitClientCmd", "WeebreeOpen.GitClientCmd\WeebreeOpen.GitClientCmd.csproj", "{9483A7AC-9A90-4CFA-85A4-CF85109CAA9D}"
 EndProject
@@ -44,7 +44,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.ErpLib", "Weebr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{47D4A621-3EBD-4329-BA85-6827B3F8345D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{03AD9922-920F-47F6-AE76-CE85CD3AC5E5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{03AD9922-920F-47F6-AE76-CE85CD3AC5E5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{6A1B8142-7594-4BF2-B210-35A2DBB0BC9E}"
 EndProject
@@ -53,6 +53,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeSample.ErpLib", "..\..\..\Git.Iw\Weebree\WeebreeInfoware.ErpLib\WeebreeSample.ErpLib.csproj", "{72050641-F737-45EB-BDDB-FACE681E2A1A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.ErpLib.Test", "WeebreeOpen.ErpLib.Test\WeebreeOpen.ErpLib.Test.csproj", "{8C6E768A-E36B-4536-9D7E-E46CFD2FFE19}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sharepoint", "Sharepoint", "{74E396AB-7989-4307-8461-AE17462260B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.SharePointLib", "WeebreeOpen.SharePointLib\WeebreeOpen.SharePointLib.csproj", "{902A63CB-589B-4A42-AAD2-B89D1B28AA6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -120,6 +124,10 @@ Global
 		{8C6E768A-E36B-4536-9D7E-E46CFD2FFE19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C6E768A-E36B-4536-9D7E-E46CFD2FFE19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C6E768A-E36B-4536-9D7E-E46CFD2FFE19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{902A63CB-589B-4A42-AAD2-B89D1B28AA6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{902A63CB-589B-4A42-AAD2-B89D1B28AA6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{902A63CB-589B-4A42-AAD2-B89D1B28AA6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{902A63CB-589B-4A42-AAD2-B89D1B28AA6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,5 +154,7 @@ Global
 		{C0720F13-FB52-4ECC-8ED7-E6D873B71D1B} = {6A1B8142-7594-4BF2-B210-35A2DBB0BC9E}
 		{72050641-F737-45EB-BDDB-FACE681E2A1A} = {7FC0E194-E111-4635-9EA4-1F328468C477}
 		{8C6E768A-E36B-4536-9D7E-E46CFD2FFE19} = {7FC0E194-E111-4635-9EA4-1F328468C477}
+		{74E396AB-7989-4307-8461-AE17462260B3} = {03AD9922-920F-47F6-AE76-CE85CD3AC5E5}
+		{902A63CB-589B-4A42-AAD2-B89D1B28AA6B} = {74E396AB-7989-4307-8461-AE17462260B3}
 	EndGlobalSection
 EndGlobal
