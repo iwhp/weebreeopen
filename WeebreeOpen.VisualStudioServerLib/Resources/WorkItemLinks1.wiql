@@ -1,0 +1,6 @@
+﻿SELECT [System.WorkItemType]
+      ,[System.Title]
+	  ,[System.State]
+	  ,[Microsoft.VSTS.Scheduling.Effort]
+	  ,[System.IterationPath]
+ FROM WorkItemLinks

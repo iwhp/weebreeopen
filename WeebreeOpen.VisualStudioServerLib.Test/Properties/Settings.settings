@@ -1,0 +1,33 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="WeebreeOpen.VisualStudioServerLib.Test.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="VsoTenantName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ardimedia</Value>
+    </Setting>
+    <Setting Name="UserName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">harry@ardimedia.com</Value>
+    </Setting>
+    <Setting Name="Password" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">harald40$</Value>
+    </Setting>
+    <Setting Name="ProjectName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">bvd.li.web</Value>
+    </Setting>
+    <Setting Name="DefaultUser" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">harry@ardimedia.com</Value>
+    </Setting>
+    <Setting Name="ProjectId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">00000000-0000-0000-0000-000000000000</Value>
+    </Setting>
+    <Setting Name="AccessToken" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">TestToken</Value>
+    </Setting>
+    <Setting Name="WorkItemId" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">877</Value>
+    </Setting>
+    <Setting Name="WorkItemRevision" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

@@ -1,0 +1,3 @@
+﻿SELECT *
+  FROM WorkItems
+ WHERE [System.ChangedDate] >= '2015-03-16'
