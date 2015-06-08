@@ -1,4 +1,4 @@
-namespace WeebreeOpen.FrameworkLib.FileWatcher
+namespace WeebreeOpen.SystemLib.FileWatcher
 {
     using System;
 

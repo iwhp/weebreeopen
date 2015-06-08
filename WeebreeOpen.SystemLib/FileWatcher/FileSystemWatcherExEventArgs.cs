@@ -1,6 +1,7 @@
-namespace WeebreeOpen.FrameworkLib.FileWatcher
+namespace WeebreeOpen.SystemLib.FileWatcher
 {
     using System.IO;
+    using WeebreeOpen.SystemLib.FileWatcher;
 
     /// <summary>
     /// This class allows us to pass any type of watcher arguments to the calling object's

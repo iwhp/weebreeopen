@@ -1,10 +1,11 @@
-﻿namespace WeebreeOpen.FrameworkLib.FileWatcher
+﻿namespace WeebreeOpen.SystemLib.FileWatcher
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using WeebreeOpen.SystemLib.FileWatcher;
 
     /// <summary>
     /// This is the main class (and the one you'll use directly). Create an instance of

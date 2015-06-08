@@ -4,13 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C0720F13-FB52-4ECC-8ED7-E6D873B71D1B}</ProjectGuid>
+    <ProjectGuid>{6735502D-8A6B-4AD4-811D-5E87C71132E0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WeebreeOpen.FrameworkLib</RootNamespace>
-    <AssemblyName>WeebreeOpen.FrameworkLib</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <RootNamespace>WeebreeOpen.SystemLib</RootNamespace>
+    <AssemblyName>WeebreeOpen.SystemLib</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,25 +41,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DateTimeExtensions.cs" />
+    <Compile Include="FileWatcher\ArgumentType.cs" />
+    <Compile Include="FileWatcher\FileSystemWatcherEx.cs" />
+    <Compile Include="FileWatcher\FileSystemWatcherExEventArgs.cs" />
+    <Compile Include="FileWatcher\FileSystemWatcherExEventHandler.cs" />
+    <Compile Include="FileWatcher\FileSystemWatcherExInfo.cs" />
     <Compile Include="FileWatcher\FileSystemWatcherHelper.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FileWatcher\PathAvailabilityHandler.cs" />
     <Compile Include="FileWatcher\PathAvailablitiyEventArgs.cs" />
-    <Compile Include="FileWatcher\FileSystemWatcherExEventArgs.cs" />
-    <Compile Include="FileWatcher\FileSystemWatcherExEventHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FileWatcher\ArgumentType.cs" />
-    <Compile Include="FileWatcher\FileSystemWatcherEx.cs" />
-    <Compile Include="FileWatcher\FileSystemWatcherExInfo.cs" />
+    <Compile Include="Scheduler\Model\FunctionName.cs" />
+    <Compile Include="Scheduler\Model\ScheduledTask.cs" />
+    <Compile Include="Scheduler\Model\Trigger.cs" />
+    <Compile Include="Scheduler\Model\TriggerFrequency.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="nuspec-packager.config" />
+    <None Include="nuspec-packager.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="!Readme.txt" />
     <Content Include="FileWatcher\!Readme.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="nuspec-packager.config" />
-    <None Include="Package.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

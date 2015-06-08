@@ -1,4 +1,4 @@
-namespace WeebreeOpen.FrameworkLib.FileWatcher
+namespace WeebreeOpen.SystemLib.FileWatcher
 {
     /// <summary>
     /// Event handlers for the watcher events we post back to the containing object.  We

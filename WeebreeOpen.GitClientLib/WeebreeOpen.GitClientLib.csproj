@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="nuspec-packager.config" />
-    <None Include="Package.nuspec" />
+    <None Include="nuspec-packager.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,10 +1,10 @@
 ﻿============================================================================================================
 DEPLOYMENT (NUGET PACKAGE)
 ------------------------------------------------------------------------------------------------------------
-> DEPLOY FROM 
-    D:\!Data\Source\Git.Github\iwhp\weebreeopen\WeebreeOpen.FrameworkLib\!!Out-NuGet
+> DEPLOY FROM
+    D:\!Data\Source\Git.Github\iwhp\weebreeopen\WeebreeOpen.SystemLib\!!Out-NuGet
   TO:
-    https://www.nuget.org/packages/WeebreeOpen.FrameworkLib
+    https://www.nuget.org/packages/WeebreeOpen.SystemLib
 ============================================================================================================
 
 ============================================================================================================
