@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40418.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.FtpClientLib", "WeebreeOpen.FtpClientLib\WeebreeOpen.FtpClientLib.csproj", "{B08DF973-B9FC-4E92-BA14-24D5B1AF8677}"
 EndProject
@@ -59,6 +59,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.SystemLib", "WeebreeOpen.SystemLib\WeebreeOpen.SystemLib.csproj", "{6735502D-8A6B-4AD4-811D-5E87C71132E0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.SystemLib.Test", "WeebreeOpen.SystemLib.Test\WeebreeOpen.SystemLib.Test.csproj", "{C287E906-A154-49A6-9CF2-318B11ECC65D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{AFDBC6A1-027A-479E-AA4C-195E7D90BC96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.WebClientLib", "WeebreeOpen.WebClientLib\WeebreeOpen.WebClientLib.csproj", "{83D20D6A-5A60-4CB5-B685-1DAFE2673F6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -134,6 +138,10 @@ Global
 		{C287E906-A154-49A6-9CF2-318B11ECC65D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C287E906-A154-49A6-9CF2-318B11ECC65D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C287E906-A154-49A6-9CF2-318B11ECC65D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83D20D6A-5A60-4CB5-B685-1DAFE2673F6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83D20D6A-5A60-4CB5-B685-1DAFE2673F6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83D20D6A-5A60-4CB5-B685-1DAFE2673F6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83D20D6A-5A60-4CB5-B685-1DAFE2673F6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -163,5 +171,7 @@ Global
 		{902A63CB-589B-4A42-AAD2-B89D1B28AA6B} = {74E396AB-7989-4307-8461-AE17462260B3}
 		{6735502D-8A6B-4AD4-811D-5E87C71132E0} = {6A1B8142-7594-4BF2-B210-35A2DBB0BC9E}
 		{C287E906-A154-49A6-9CF2-318B11ECC65D} = {6A1B8142-7594-4BF2-B210-35A2DBB0BC9E}
+		{AFDBC6A1-027A-479E-AA4C-195E7D90BC96} = {03AD9922-920F-47F6-AE76-CE85CD3AC5E5}
+		{83D20D6A-5A60-4CB5-B685-1DAFE2673F6B} = {AFDBC6A1-027A-479E-AA4C-195E7D90BC96}
 	EndGlobalSection
 EndGlobal
