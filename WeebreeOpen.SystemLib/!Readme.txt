@@ -1,6 +1,15 @@
 ﻿============================================================================================================
 DEPLOYMENT (NUGET PACKAGE)
 ------------------------------------------------------------------------------------------------------------
+> DEPLOY LOCAL
+  CLS
+  CD C:\!Data\Code\Git.Github\iwhp\weebreeopen\WeebreeOpen.SystemLib
+  devenv ../WeebreeOpen.sln /project WeebreeOpen.SystemLib.csproj /rebuild Debug
+
+  C:\!APP\nuget\nuget-3.2.1-rc.exe pack .\nuspec-packager.nuspec -OutputDirectory .\!NuGet-Out
+
+  COPY .\!NuGet-Out\WeebreeOpen.SystemLib.0.0.2-beta.nupkg \\SVRTFS01\D$\!Data\NuGet\Packages
+------------------------------------------------------------------------------------------------------------
 > DEPLOY FROM
     D:\!Data\Source\Git.Github\iwhp\weebreeopen\WeebreeOpen.SystemLib\!!Out-NuGet
   TO:

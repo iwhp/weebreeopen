@@ -59,7 +59,6 @@
     <Compile Include="Scheduler\Model\TriggerFrequency.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="nuspec-packager.config" />
     <None Include="nuspec-packager.nuspec" />
   </ItemGroup>
   <ItemGroup>

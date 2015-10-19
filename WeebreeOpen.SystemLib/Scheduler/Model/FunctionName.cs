@@ -8,6 +8,7 @@
         LgtBcReportProcessOpenWorkOrders,
         LgtBcReportCreateInvoice,
         NestleIceErpCopyPdfCreatePreview,
+        NestleIceErpImportMdb,
         NestleIceErpReportWorkOrderFinishedMissingProductionPrice
     }
 }
