@@ -1,15 +1,15 @@
-﻿namespace WeebreeOpen.FtpClientLib.Service
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Text;
-    using System.Text.RegularExpressions;
-    using WeebreeOpen.FtpClientLib.Model;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Text.RegularExpressions;
+using WeebreeOpen.FtpClientLib.Model;
 
+namespace WeebreeOpen.FtpClientLib.Service
+{
     public class FtpClientService
     {
         #region Constructors
@@ -292,7 +292,7 @@
 
         public bool DeleteDirectoryRecursive(string directoryPath)
         {
-            // Delete all entries within the diretory
+            // Delete all entries within the directory
             List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(directoryPath);
 
             foreach (var ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())

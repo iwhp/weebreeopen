@@ -1,18 +1,12 @@
-using System.Diagnostics;
-using System.Data;
-using System.Collections;
-using Microsoft.VisualBasic;
-using System.Collections.Generic;
 using System;
-using System.Net;
-using System.IO;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Net;
+using System.Text.RegularExpressions;
 
 namespace FTP
 {
-
-
     #region "FTP client class"
     /// <summary>
     /// A wrapper class for .NET 2.0 FTP
@@ -687,7 +681,6 @@ namespace FTP
     }
     #endregion
 
-
     #region "FTP file info class"
     /// <summary>
     /// Represents a file or directory entry from an FTP listing
@@ -984,6 +977,4 @@ namespace FTP
         }
     }
     #endregion
-
 }
-

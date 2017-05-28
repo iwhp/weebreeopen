@@ -1,8 +1,8 @@
-﻿namespace WeebreeOpen.FtpClientLib.Model
-{
-    using System;
-    using System.Linq;
+﻿using System;
+using System.Linq;
 
+namespace WeebreeOpen.FtpClientLib.Model
+{
     public enum FtpServiceEventType
     {
         Information,
