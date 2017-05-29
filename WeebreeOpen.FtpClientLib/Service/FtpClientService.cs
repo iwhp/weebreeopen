@@ -45,41 +45,25 @@ namespace WeebreeOpen.FtpClientLib.Service
 
         public FtpClientConnection FtpClientConnection { get; private set; }
 
-        //private string currentDirectory = "/";
-
-        //public string CurrentDirectory
-        //{
-        //    get
-        //    {
-        //        //return directory, ensure it ends with /
-        //        return currentDirectory + ((currentDirectory.EndsWith("/")) ? "" : "/").ToString();
-        //    }
-        //    set
-        //    {
-        //        if (!value.StartsWith("/"))
-        //        {
-        //            throw (new ApplicationException("Directory should start with /"));
-        //        }
-        //        currentDirectory = value;
-        //    }
-        //}
-
         /// <summary>
         /// List of REGEX formats for different FTP server listing formats.
         /// </summary>
         private static readonly string[] parseFormats = new string[]
         {
-            //  UNIX/LINUX
-            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\w+\\s+\\w+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{4})\\s+(?<filename>.+)",
-            //  UNIX/LINUX
-            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\d+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{4})\\s+(?<filename>.+)",
-            //  UNIX/LINUX
-            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\d+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{1,2}:\\d{2})\\s+(?<filename>.+)",
-            //  MS FTP in detailed mode
-            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})\\s+\\d+\\s+\\w+\\s+\\w+\\s+(?<size>\\d+)\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{1,2}:\\d{2})\\s+(?<filename>.+)",
-            "(?<dir>[\\-d])(?<permission>([\\-r][\\-w][\\-xs]){3})(\\s+)(?<size>(\\d+))(\\s+)(?<ctbit>(\\w+\\s\\w+))(\\s+)(?<size2>(\\d+))\\s+(?<timestamp>\\w+\\s+\\d+\\s+\\d{2}:\\d{2})\\s+(?<filename>.+)",
-            //  MS FTP in 'DOS' mode
-            "(?<timestamp>\\d{2}\\-\\d{2}\\-\\d{2}\\s+\\d{2}:\\d{2}[Aa|Pp][mM])\\s+(?<dir>\\<\\w+\\>){0,1}(?<size>\\d+){0,1}\\s+(?<filename>.+)"
+            // UNIX/LINUX
+            @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})\s+\d+\s+\w+\s+\w+\s+(?<size>\d+)\s+(?<timestamp>\w+\s+\d+\s+\d{4})\s+(?<filename>.+)",
+            // UNIX/LINUX
+            @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})\s+\d+\s+\d+\s+(?<size>\d+)\s+(?<timestamp>\w+\s+\d+\s+\d{4})\s+(?<filename>.+)",
+            // UNIX/LINUX
+            @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})\s+\d+\s+\d+\s+(?<size>\d+)\s+(?<timestamp>\w+\s+\d+\s+\d{1,2}:\d{2})\s+(?<filename>.+)",
+            // ???
+            // Processing: drwxrwxrwx               folder        0 May 29 19:22 TestDir1
+            @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})\s+folder\s+(?<size>\d+)\s+(?<timestamp>\w+\s+\d+\s+\d{1,2}:\d{2})\s+(?<filename>.+)",
+            // MS FTP in detailed mode
+            @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})\s+\d+\s+\w+\s+\w+\s+(?<size>\d+)\s+(?<timestamp>\w+\s+\d+\s+\d{1,2}:\d{2})\s+(?<filename>.+)",
+            @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})(\s+)(?<size>(\d+))(\s+)(?<ctbit>(\w+\s\w+))(\s+)(?<size2>(\d+))\s+(?<timestamp>\w+\s+\d+\s+\d{2}:\d{2})\s+(?<filename>.+)",
+            // MS FTP in 'DOS' mode
+            @"(?<timestamp>\d{2}\-\d{2}\-\d{2}\s+\d{2}:\d{2}[Aa|Pp][mM])\s+(?<dir>\<\w+\>){0,1}(?<size>\d+){0,1}\s+(?<filename>.+)"
         };
 
         #endregion
@@ -112,7 +96,7 @@ namespace WeebreeOpen.FtpClientLib.Service
         {
             List<FtpEntry> allEntries = ProcessListing(initialDirectoryPath).ToList();
 
-            foreach (var rootItem in allEntries.Where(x => x.FtpEntryType == FtpEntryType.Directory).ToList())
+            foreach (FtpEntry rootItem in allEntries.Where(x => x.FtpEntryType == FtpEntryType.Directory).ToList())
             {
                 allEntries.AddRange(GetDirectoryListingRecursive(rootItem.DirectoryPath));
             }
@@ -122,10 +106,10 @@ namespace WeebreeOpen.FtpClientLib.Service
 
         private IEnumerable<FtpEntry> ProcessListing(string directoryPath)
         {
-            var ftpWebResponseString = new StringBuilder();
+            StringBuilder ftpWebResponseString = new StringBuilder();
 
             FtpWebRequest ftpWebRequest;
-            ftpWebRequest = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + this.FtpClientConnection.ServerNameOrIp + "/" + directoryPath));
+            ftpWebRequest = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(directoryPath)));
             ftpWebRequest.UseBinary = true;
             ftpWebRequest.Credentials = new NetworkCredential(this.FtpClientConnection.UserName, this.FtpClientConnection.Password);
             ftpWebRequest.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
@@ -165,17 +149,22 @@ namespace WeebreeOpen.FtpClientLib.Service
 
         private IEnumerable<FtpEntry> ParseAndExtractDirectoryListing(string[] lines, string directoryPathInital)
         {
-            foreach (var line in lines)
+            foreach (string line in lines)
             {
                 Match split = GetMatchingRegex(line);
 
+                if (split == null)
+                {
+                    break;
+                }
+
                 int x;
-                var dir = split.Groups["dir"].ToString();
+                string dir = split.Groups["dir"].ToString();
                 //var permission = split.Groups["permission"].ToString();
                 //var filecode = split.Groups["filecode"].ToString();
                 //var owner = split.Groups["owner"].ToString();
                 //var group = split.Groups["group"].ToString();
-                var size = split.Groups["size"].ToString();
+                string size = split.Groups["size"].ToString();
                 //var month = split.Groups["month"].ToString();
                 //var timeYear = split.Groups["year"].ToString();
                 //var time = split.Groups["time"].ToString();
@@ -209,7 +198,7 @@ namespace WeebreeOpen.FtpClientLib.Service
                     dateTime = Convert.ToDateTime(null);
                 }
 
-                var filename = split.Groups["filename"].ToString();
+                string filename = split.Groups["filename"].ToString();
 
                 FtpEntryType ftpEntryType;
                 string directoryPath;
@@ -233,7 +222,7 @@ namespace WeebreeOpen.FtpClientLib.Service
                     Name = filename,
                     //Owner = owner,
                     //Permission = permission,
-                    Size = Int32.TryParse(size, out x) ? x : 0,
+                    Size = int.TryParse(size, out x) ? x : 0,
                     DateTime = dateTime,
                     FtpEntryType = ftpEntryType,
                     DirectoryPath = directoryPath
@@ -248,16 +237,26 @@ namespace WeebreeOpen.FtpClientLib.Service
 
         #region Directory Create, Delete
 
+        /// <summary>
+        /// Will create one new directory.
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        /// <returns>true if directory was created, false if not.</returns>
         public bool CreateDirectory(string directoryPath)
         {
-            //perform create
-            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(directoryPath);
-            System.Net.FtpWebRequest ftp = GetRequest(uri);
-            //Set request to MkDir
-            ftp.Method = System.Net.WebRequestMethods.Ftp.MakeDirectory;
+            directoryPath = AdjustDir(directoryPath);
+
+            string[] directoryPaths = directoryPath.Split('/');
+
+            // Perform create
+            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + directoryPath;
+            FtpWebRequest ftp = GetRequest(uri);
+
+            // Set request to MkDir
+            ftp.Method = WebRequestMethods.Ftp.MakeDirectory;
             try
             {
-                //get response but ignore it
+                // Get response but ignore it
                 string str = GetStringResponse(ftp);
                 OnRaiseFtpServiceEvent(FtpServiceEventArgs.DirectoryCreate(directoryPath));
             }
@@ -271,14 +270,15 @@ namespace WeebreeOpen.FtpClientLib.Service
 
         public bool DeleteDirectory(string directoryPath)
         {
-            //perform remove
+            // Perform remove
             string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(directoryPath);
-            System.Net.FtpWebRequest ftp = GetRequest(uri);
-            //Set request to RmDir
-            ftp.Method = System.Net.WebRequestMethods.Ftp.RemoveDirectory;
+            FtpWebRequest ftp = GetRequest(uri);
+
+            // Set request to RmDir
+            ftp.Method = WebRequestMethods.Ftp.RemoveDirectory;
             try
             {
-                //get response but ignore it
+                // Get response but ignore it
                 string str = GetStringResponse(ftp);
                 OnRaiseFtpServiceEvent(FtpServiceEventArgs.DirectoryDelete(directoryPath));
             }
@@ -295,7 +295,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             // Delete all entries within the directory
             List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(directoryPath);
 
-            foreach (var ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
+            foreach (FtpEntry ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
             {
                 if (ftpEntry.FtpEntryType == FtpEntryType.File)
                 {
@@ -330,7 +330,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             System.IO.Directory.CreateDirectory(startingPathTarget);
 
             // Copy all Files
-            foreach (var ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
+            foreach (FtpEntry ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
             {
                 // Build target path
                 string x1 = ftpEntry.DirectoryPath;
@@ -401,13 +401,13 @@ namespace WeebreeOpen.FtpClientLib.Service
 
         private bool DownloadFile(string filePathSource, FileInfo fileInfoTarget, bool overrideExisting, DateTime? setDateTimeForFile = null)
         {
-            //1. check target
+            // 1. check target
             if (fileInfoTarget.Exists && !(overrideExisting))
             {
                 throw (new ApplicationException("Target file already exists"));
             }
 
-            //2. check source
+            // 2. check source
             string source;
             if (filePathSource.Trim() == "")
             {
@@ -415,30 +415,30 @@ namespace WeebreeOpen.FtpClientLib.Service
             }
             else if (filePathSource.Contains("/"))
             {
-                //treat as a full path
+                // Treat as a full path
                 source = AdjustDir(filePathSource);
             }
             else
             {
-                //treat as filename only, use current directory
+                // Treat as filename only, use current directory
                 source = filePathSource;
             }
 
             string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + source;
 
-            //3. perform copy
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            // 3. perform copy
+            FtpWebRequest ftp = GetRequest(URI);
 
-            //Set request to download a file in binary mode
-            ftp.Method = System.Net.WebRequestMethods.Ftp.DownloadFile;
+            // Set request to download a file in binary mode
+            ftp.Method = WebRequestMethods.Ftp.DownloadFile;
             ftp.UseBinary = true;
 
-            //open request and get response stream
+            // Open request and get response stream
             using (FtpWebResponse response = (FtpWebResponse)ftp.GetResponse())
             {
                 using (Stream responseStream = response.GetResponseStream())
                 {
-                    //loop to read & write to file
+                    // Loop to read & write to file
                     using (FileStream fs = fileInfoTarget.OpenWrite())
                     {
                         try
@@ -457,9 +457,9 @@ namespace WeebreeOpen.FtpClientLib.Service
                         catch (Exception ex)
                         {
                             OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not download file: [{0}] to file [{1}].", filePathSource, fileInfoTarget), ex));
-                            //catch error and delete file only partially downloaded
+                            // Catch error and delete file only partially downloaded
                             fs.Close();
-                            //delete target file as it's incomplete
+                            // Delete target file as it's incomplete
                             fileInfoTarget.Delete();
                             return false;
                         }
@@ -496,12 +496,12 @@ namespace WeebreeOpen.FtpClientLib.Service
         /// or a full path and filename if required.</remarks>
         public bool UploadFile(string filePathSource, string filePathTarget)
         {
-            //1. check source
+            // 1. check source
             if (!File.Exists(filePathSource))
             {
                 throw (new ApplicationException("File " + filePathSource + " not found"));
             }
-            //copy to FI
+            // Copy to FI
             FileInfo fi = new FileInfo(filePathSource);
             return UploadFile(fi, filePathTarget);
         }
@@ -514,49 +514,49 @@ namespace WeebreeOpen.FtpClientLib.Service
         /// <returns></returns>
         private bool UploadFile(FileInfo fileInfoSource, string filePathTarget)
         {
-            //copy the file specified to target file: target file can be full path or just filename (uses current dir)
+            // Copy the file specified to target file: target file can be full path or just filename (uses current dir)
 
-            //1. check target
+            // 1. check target
             string target;
             if (filePathTarget.Trim() == "")
             {
-                //Blank target: use source filename & current dir
+                // Blank target: use source filename & current dir
                 target = fileInfoSource.Name;
             }
             else if (filePathTarget.Contains("/"))
             {
-                //If contains / treat as a full path
+                // If contains / treat as a full path
                 target = AdjustDir(filePathTarget);
             }
             else
             {
-                //otherwise treat as filename only, use current directory
+                // Otherwise treat as filename only, use current directory
                 target = filePathTarget;
             }
 
             string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + target;
 
-            //perform copy
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            // Perform copy
+            FtpWebRequest ftp = GetRequest(URI);
 
-            //Set request to upload a file in binary
-            ftp.Method = System.Net.WebRequestMethods.Ftp.UploadFile;
+            // Set request to upload a file in binary
+            ftp.Method = WebRequestMethods.Ftp.UploadFile;
             ftp.UseBinary = true;
 
-            //Notify FTP of the expected size
+            // Notify FTP of the expected size
             ftp.ContentLength = fileInfoSource.Length;
 
-            //create byte array to store: ensure at least 1 byte!
+            // Create byte array to store: ensure at least 1 byte!
             const int BufferSize = 2048;
             byte[] content = new byte[BufferSize - 1 + 1];
             int dataRead;
 
-            //open file for reading
+            // Open file for reading
             using (FileStream fs = fileInfoSource.OpenRead())
             {
                 try
                 {
-                    //open request to send
+                    // Open request to send
                     using (Stream rs = ftp.GetRequestStream())
                     {
                         do
@@ -575,7 +575,7 @@ namespace WeebreeOpen.FtpClientLib.Service
                 }
                 finally
                 {
-                    //ensure file closed
+                    // Ensure file closed
                     fs.Close();
                     OnRaiseFtpServiceEvent(FtpServiceEventArgs.FileUpload(fileInfoSource.FullName, filePathTarget));
                 }
@@ -600,15 +600,15 @@ namespace WeebreeOpen.FtpClientLib.Service
         /// <remarks></remarks>
         public bool DeleteFile(string filePath)
         {
-            //Determine if file or full path
+            // Determine if file or full path
             string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + GetFullPath(filePath);
 
-            System.Net.FtpWebRequest ftp = GetRequest(uri);
-            //Set request to delete
-            ftp.Method = System.Net.WebRequestMethods.Ftp.DeleteFile;
+            FtpWebRequest ftp = GetRequest(uri);
+            // Set request to delete
+            ftp.Method = WebRequestMethods.Ftp.DeleteFile;
             try
             {
-                //get response but ignore it
+                // Get response but ignore it
                 string str = GetStringResponse(ftp);
                 OnRaiseFtpServiceEvent(FtpServiceEventArgs.FileDelete(filePath));
             }
@@ -639,7 +639,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             outputHtml += string.Format("<p>Errors Occurred: {0}</p>", ftpServiceEvents.Where(x => x.Type == FtpServiceEventType.Error).Count());
             outputHtml += "<ul>";
 
-            foreach (var item in ftpServiceEvents.Where(x => x.Type == FtpServiceEventType.Error).OrderBy(x => x.EventOccuredAt))
+            foreach (FtpServiceEventArgs item in ftpServiceEvents.Where(x => x.Type == FtpServiceEventType.Error).OrderBy(x => x.EventOccuredAt))
             {
                 outputHtml = FormatHtmlOutputForItem(outputHtml, item);
             }
@@ -651,7 +651,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             outputHtml += string.Format("<p>Number of Actions: {0}</p>", ftpServiceEvents.Where(x => x.Type != FtpServiceEventType.Error).Count());
             outputHtml += "<ul>";
 
-            foreach (var item in ftpServiceEvents.Where(x => x.Type != FtpServiceEventType.Error).OrderBy(x => x.EventOccuredAt))
+            foreach (FtpServiceEventArgs item in ftpServiceEvents.Where(x => x.Type != FtpServiceEventType.Error).OrderBy(x => x.EventOccuredAt))
             {
                 outputHtml = FormatHtmlOutputForItem(outputHtml, item);
             }
@@ -715,11 +715,11 @@ namespace WeebreeOpen.FtpClientLib.Service
         //common settings and security
         private FtpWebRequest GetRequest(string uri)
         {
-            //create request
+            // Create request
             FtpWebRequest result = (FtpWebRequest)FtpWebRequest.Create(uri);
-            //Set the login details
+            // Set the login details
             result.Credentials = GetCredentials();
-            //Do not keep alive (stateless mode)
+            // Do not keep alive (stateless mode)
             result.KeepAlive = false;
             return result;
         }
@@ -727,9 +727,9 @@ namespace WeebreeOpen.FtpClientLib.Service
         /// <summary>
         /// Get the credentials from username/password
         /// </summary>
-        private System.Net.ICredentials GetCredentials()
+        private ICredentials GetCredentials()
         {
-            return new System.Net.NetworkCredential(this.FtpClientConnection.UserName, this.FtpClientConnection.Password);
+            return new NetworkCredential(this.FtpClientConnection.UserName, this.FtpClientConnection.Password);
         }
 
         private static Match GetMatchingRegex(string line)
@@ -750,6 +750,7 @@ namespace WeebreeOpen.FtpClientLib.Service
 
         private string AdjustDir(string path)
         {
+            // Add [/] if missing
             return ((path.StartsWith("/")) ? "" : "/").ToString() + path;
         }
 

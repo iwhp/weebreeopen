@@ -64,9 +64,10 @@ namespace FTP
         public List<string> ListDirectory(string directory)
         {
             //return a simple list of filenames in directory
-            System.Net.FtpWebRequest ftp = GetRequest(GetDirectory(directory));
+            FtpWebRequest ftp = GetRequest(GetDirectory(directory));
+
             //Set request to do simple list
-            ftp.Method = System.Net.WebRequestMethods.Ftp.ListDirectory;
+            ftp.Method = WebRequestMethods.Ftp.ListDirectory;
 
             string str = GetStringResponse(ftp);
             //replace CRLF to CR, remove last instance
@@ -84,9 +85,10 @@ namespace FTP
         /// <returns>An FTPDirectory object</returns>
         public FTPdirectory ListDirectoryDetail(string directory)
         {
-            System.Net.FtpWebRequest ftp = GetRequest(GetDirectory(directory));
+            FtpWebRequest ftp = GetRequest(GetDirectory(directory));
+
             //Set request to do simple list
-            ftp.Method = System.Net.WebRequestMethods.Ftp.ListDirectoryDetails;
+            ftp.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
 
             string str = GetStringResponse(ftp);
             //replace CRLF to CR, remove last instance
@@ -149,10 +151,10 @@ namespace FTP
 
             string URI = Hostname + target;
             //perform copy
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            FtpWebRequest ftp = GetRequest(URI);
 
             //Set request to upload a file in binary
-            ftp.Method = System.Net.WebRequestMethods.Ftp.UploadFile;
+            ftp.Method = WebRequestMethods.Ftp.UploadFile;
             ftp.UseBinary = true;
 
             //Notify FTP of the expected size
@@ -256,10 +258,10 @@ namespace FTP
             string URI = Hostname + target;
 
             //3. perform copy
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            FtpWebRequest ftp = GetRequest(URI);
 
             //Set request to download a file in binary mode
-            ftp.Method = System.Net.WebRequestMethods.Ftp.DownloadFile;
+            ftp.Method = WebRequestMethods.Ftp.DownloadFile;
             ftp.UseBinary = true;
 
             //open request and get response stream
@@ -316,9 +318,9 @@ namespace FTP
             //Determine if file or full path
             string URI = this.Hostname + GetFullPath(filename);
 
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            FtpWebRequest ftp = GetRequest(URI);
             //Set request to delete
-            ftp.Method = System.Net.WebRequestMethods.Ftp.DeleteFile;
+            ftp.Method = WebRequestMethods.Ftp.DeleteFile;
             try
             {
                 //get response but ignore it
@@ -350,7 +352,7 @@ namespace FTP
             catch (Exception ex)
             {
                 //only handle expected not-found exception
-                if (ex is System.Net.WebException)
+                if (ex is WebException)
                 {
                     //file does not exist/no rights error = 550
                     if (ex.Message.Contains("550"))
@@ -388,9 +390,10 @@ namespace FTP
                 path = this.CurrentDirectory + filename;
             }
             string URI = this.Hostname + path;
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            FtpWebRequest ftp = GetRequest(URI);
+
             //Try to get info on file/dir?
-            ftp.Method = System.Net.WebRequestMethods.Ftp.GetFileSize;
+            ftp.Method = WebRequestMethods.Ftp.GetFileSize;
             string tmp = this.GetStringResponse(ftp);
             return GetSize(ftp);
         }
@@ -418,9 +421,10 @@ namespace FTP
             //perform rename
             string URI = this.Hostname + source;
 
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            FtpWebRequest ftp = GetRequest(URI);
+
             //Set request to delete
-            ftp.Method = System.Net.WebRequestMethods.Ftp.Rename;
+            ftp.Method = WebRequestMethods.Ftp.Rename;
             ftp.RenameTo = target;
             try
             {
@@ -438,9 +442,9 @@ namespace FTP
         {
             //perform create
             string URI = this.Hostname + AdjustDir(dirpath);
-            System.Net.FtpWebRequest ftp = GetRequest(URI);
+            FtpWebRequest ftp = GetRequest(URI);
             //Set request to MkDir
-            ftp.Method = System.Net.WebRequestMethods.Ftp.MakeDirectory;
+            ftp.Method = WebRequestMethods.Ftp.MakeDirectory;
             try
             {
                 //get response but ignore it
@@ -457,9 +461,9 @@ namespace FTP
         {
             //perform remove
             string uri = this.Hostname + AdjustDir(dirpath);
-            System.Net.FtpWebRequest ftp = GetRequest(uri);
+            FtpWebRequest ftp = GetRequest(uri);
             //Set request to RmDir
-            ftp.Method = System.Net.WebRequestMethods.Ftp.RemoveDirectory;
+            ftp.Method = WebRequestMethods.Ftp.RemoveDirectory;
             try
             {
                 //get response but ignore it
@@ -490,9 +494,9 @@ namespace FTP
         /// <summary>
         /// Get the credentials from username/password
         /// </summary>
-        private System.Net.ICredentials GetCredentials()
+        private ICredentials GetCredentials()
         {
-            return new System.Net.NetworkCredential(Username, Password);
+            return new NetworkCredential(Username, Password);
         }
 
         /// <summary>

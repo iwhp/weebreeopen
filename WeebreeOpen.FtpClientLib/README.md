@@ -2,8 +2,7 @@
 
 ## PREPARE NUGET:
 
-- Download NuGet.exe from nuget.com
-- Copy NuGet.exe to C:\!App\NuGet
+- Download nuget.exe from nuget.org (save in: C:\APP\NuGet)
 - Register NuGet API-KEY (get the API key from nuget.com)
 
       nuget setApiKey [API-KEY]
@@ -11,12 +10,25 @@
 ## CHANGE VERSION INFORMATION (x.x.x) in the following files
 
 - AssemblyInfo.cs
-- Package.nuspec
-- Build Project (Release)
+- WeebreeOpen.FtpClientLib.nuspec
+
+## Build Project (Release)
+
+- Build the project with the Release configuration
+
+## CREATE THE PACKAGE
+
+    D:
+    CD \CODE\Git.Github\iwhp\weebreeopen\WeebreeOpen.FtpClientLib
+    C:\APP\NuGet\nuget pack -Prop Platform=AnyCPU -Prop Configuration=Release
+
 
 ## PUSH PACKAGE TO nuget.com
 
-    C:\!App\NuGet\nuget push C:\!Data\Code\Git.Github\iwhp\weebreeopen\WeebreeOpen.FtpClientLib\!!Out-NuGet\WeebreeOpen.FtpClientLib.0.0.17-beta.nupkg
+    D:
+    CD \CODE\Git.Github\iwhp\weebreeopen\WeebreeOpen.FtpClientLib
+    C:\APP\NuGet\nuget push WeebreeOpen.FtpClientLib.0.0.19-beta.nupkg -Source https://www.nuget.org/api/v2/package
+
 
 # LINKS
 

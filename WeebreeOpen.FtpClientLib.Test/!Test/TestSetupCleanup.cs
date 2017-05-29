@@ -18,7 +18,7 @@
         public static string TestDataFileText1 = @"!Test\Data\testfile1-text.txt";
         public static string TestDataFileBinary1 = @"!Test\Data\testfile2-image.jpg";
 
-        public static string FtpTestRootFolder = "BVDWeb/WeebreeOpenTest/";    // if filled, end with a slash (/)
+        public static string FtpTestRootFolder = "UnitTest_WeebreeOpenTest/";    // if filled, end with a slash (/)
         public static string FtpFileText1 = TestSetupCleanup.FtpTestRootFolder + "FtpToFileText1.txt";
         public static string FtpFileBinary1 = TestSetupCleanup.FtpTestRootFolder + "FtpToFileBinary1.jpg";
         public static string FtpDirectory1 = TestSetupCleanup.FtpTestRootFolder + "TestDir1/";

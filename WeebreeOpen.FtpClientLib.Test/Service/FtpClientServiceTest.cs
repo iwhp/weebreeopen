@@ -158,6 +158,21 @@
         }
 
         [TestMethod]
+        public void FtpClientService_Directory_Create_Sub()
+        {
+            // Assign
+            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
+            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
+            sut.CreateDirectory(TestSetupCleanup.FtpTestRootFolder);
+
+            // Act
+            bool result = sut.CreateDirectory(TestSetupCleanup.FtpDirectory1 + "subdir1/");
+
+            // Assert
+            Assert.AreEqual<bool>(true, result);
+        }
+
+        [TestMethod]
         public void FtpClientService_Directory_Delete()
         {
             // Assign
@@ -247,7 +262,7 @@
             input.Add(FtpServiceEventArgs.Error("message", new Exception("exception")));
             input.Add(FtpServiceEventArgs.FileDelete("file", "message"));
             input.Add(FtpServiceEventArgs.FileDownload("fileFrom", "fileTO", "message"));
-            input.Add(FtpServiceEventArgs.FileUpload("fileFrom","fileTo","message"));
+            input.Add(FtpServiceEventArgs.FileUpload("fileFrom", "fileTo", "message"));
             input.Add(FtpServiceEventArgs.Information("message"));
 
             // Act
