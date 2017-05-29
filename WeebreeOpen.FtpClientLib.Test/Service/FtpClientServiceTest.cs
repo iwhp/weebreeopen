@@ -4,12 +4,11 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using WeebreeOpen.FtpClientLib.Model;
 using WeebreeOpen.FtpClientLib.Service;
-using WeebreeOpen.FtpClientLib.Test.Test;
 
 namespace WeebreeOpen.FtpClientLib.Test.Service
 {
     [TestClass]
-    public class FtpClientServiceTest
+    public class FtpClientServiceTest : TestBase
     {
         #region GetDirectoryListing
 
@@ -17,20 +16,21 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_GetDirectoryListing()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            TestBase.CreateTestEnvironment();
 
             // Act
-            List<FtpEntry> result = sut.GetDirectoryListing(TestSetupCleanup.FtpTestRootFolder).ToList();
+            List<FtpEntry> result = sut.GetDirectoryListing(TestBase.FtpTestRootFolder).ToList();
 
             // Log
-            foreach (var ftpEntry in result)
+            foreach (FtpEntry ftpEntry in result)
             {
                 Console.WriteLine(ftpEntry);
             }
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual<int>(4, result.Count, "We assume that there are 2 files and 2 directories on the FTP server in the root test directory.");
+            Assert.AreEqual<int>(6, result.Count, "We assume that there are 4 files and 2 directories on the FTP server in the root test directory.");
         }
 
         #endregion
@@ -41,13 +41,13 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_GetDirectoryListingRecursive()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
-            List<FtpEntry> result = sut.GetDirectoryListingRecursive(TestSetupCleanup.FtpTestRootFolder).ToList();
+            List<FtpEntry> result = sut.GetDirectoryListingRecursive(TestBase.FtpTestRootFolder).ToList();
 
             // Log
-            foreach (var ftpEntry in result)
+            foreach (FtpEntry ftpEntry in result)
             {
                 Console.WriteLine(ftpEntry);
             }
@@ -65,10 +65,10 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileDownload_TextFile()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
-            bool result = sut.DownloadFile(TestSetupCleanup.FtpFileText1, TestSetupCleanup.LocalFileText1, true);
+            bool result = sut.DownloadFile(TestBase.FtpFileText1, TestBase.LocalFileText1, true);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -78,10 +78,11 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileDownload_BinaryFile()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            TestBase.CreateTestEnvironment();
 
             // Act
-            bool result = sut.DownloadFile(TestSetupCleanup.FtpFileBinary1, TestSetupCleanup.LocalFileBinary1, true);
+            bool result = sut.DownloadFile(TestBase.FtpFileBinary1, TestBase.LocalFileBinary1, true);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -95,10 +96,10 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileDownloadRecursive()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
-            bool result = sut.DownloadFileRecursive(TestSetupCleanup.FtpTestRootFolder, TestSetupCleanup.LocalTestRootFolder, true, false);
+            bool result = sut.DownloadFileRecursive(TestBase.FtpTestRootFolder, TestBase.LocalTestRootFolder, true, false);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -112,10 +113,10 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileUpload()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
-            bool result = sut.UploadFile(TestSetupCleanup.TestDataFileText1, TestSetupCleanup.FtpFileText1);
+            bool result = sut.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText1);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -129,10 +130,11 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileDelete()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            TestBase.CreateTestEnvironment();
 
             // Act
-            bool result = sut.DeleteFile(TestSetupCleanup.FtpFileText1);
+            bool result = sut.DeleteFile(TestBase.FtpFileText1);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -146,48 +148,38 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_Directory_Exists_true()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
-            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
-            sut.CreateDirectory(TestSetupCleanup.FtpTestRootFolder);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
-            bool result = sut.DirectoryExists(TestSetupCleanup.FtpTestRootFolder);
+            bool result = sut.DirectoryExists(TestBase.FtpTestRootFolder);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
-
-            // Clean
-            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
         }
 
         [TestMethod]
         public void FtpClientService_Directory_Exists_false()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
-            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
-            sut.CreateDirectory(TestSetupCleanup.FtpTestRootFolder);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            sut.DeleteDirectoryRecursive(TestBase.FtpTestRootFolder);
 
             // Act
-            bool result = sut.DirectoryExists(TestSetupCleanup.FtpDirectory1);
+            bool result = sut.DirectoryExists(TestBase.FtpDirectory1);
 
             // Assert
             Assert.AreEqual<bool>(false, result);
-
-            // Clean
-            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
         }
 
         [TestMethod]
         public void FtpClientService_Directory_Create()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
-            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
-            sut.CreateDirectory(TestSetupCleanup.FtpTestRootFolder);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            sut.DeleteDirectoryRecursive(TestBase.FtpDirectory1);
 
             // Act
-            bool result = sut.CreateDirectory(TestSetupCleanup.FtpDirectory1);
+            bool result = sut.CreateDirectory(TestBase.FtpDirectory1);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -197,12 +189,10 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_Directory_Create_Sub()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
-            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
-            sut.CreateDirectory(TestSetupCleanup.FtpTestRootFolder);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
-            bool result = sut.CreateDirectory(TestSetupCleanup.FtpDirectory1 + "subdir1/");
+            bool result = sut.CreateDirectory(TestBase.FtpDirectory1 + "subdir1/");
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -212,13 +202,12 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_Directory_Delete()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
-            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
-            sut.CreateDirectory(TestSetupCleanup.FtpTestRootFolder);
-            sut.CreateDirectory(TestSetupCleanup.FtpDirectory1);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            sut.DeleteDirectoryRecursive(TestBase.FtpDirectory1);
+            sut.CreateDirectory(TestBase.FtpDirectory1);
 
             // Act
-            bool result = sut.DeleteDirectory(TestSetupCleanup.FtpDirectory1);
+            bool result = sut.DeleteDirectory(TestBase.FtpDirectory1);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -232,27 +221,21 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_DeleteDirectoryWithFile()
         {
             // Assign
-            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
-            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
-            sut.CreateDirectory(TestSetupCleanup.FtpTestRootFolder);
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
             sut.EventMessages.Clear();
-            bool result1 = sut.CreateDirectory(TestSetupCleanup.FtpDirectory1);
-            bool result2 = sut.UploadFile(TestSetupCleanup.LocalFileText1, TestSetupCleanup.FtpFileText3);
-            bool result3 = sut.DeleteDirectory(TestSetupCleanup.FtpDirectory1);
-            bool result4 = sut.DeleteFile(TestSetupCleanup.FtpFileText3);
-            bool result5 = sut.DeleteDirectory(TestSetupCleanup.FtpDirectory1);
+            bool result3 = sut.DeleteDirectory(TestBase.FtpDirectory1);
+            bool result4 = sut.DeleteFile(TestBase.FtpFileText3);
+            bool result5 = sut.DeleteDirectory(TestBase.FtpDirectory1);
 
             // Assert
-            Assert.AreEqual<bool>(true, result1, "Directory created failed.");
-            Assert.AreEqual<bool>(true, result2, "Update File failed.");
-            Assert.AreEqual<bool>(false, result3, "Directory was deleted - this should NOT be possible since there are files in the direcory.");
+            Assert.AreEqual<bool>(false, result3, "Directory was deleted - this should NOT be possible since there are files in the directory.");
             Assert.AreEqual<bool>(true, result4, "File could not be deleted.");
             Assert.AreEqual<bool>(true, result5, "Directory could not be deleted");
 
             // Log
-            foreach (var message in sut.EventMessages)
+            foreach (FtpServiceEventArgs message in sut.EventMessages)
             {
                 Console.WriteLine(message.ToString());
             }

@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.FtpClientLib", "WeebreeOpen.FtpClientLib\WeebreeOpen.FtpClientLib.csproj", "{B08DF973-B9FC-4E92-BA14-24D5B1AF8677}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.FtpClientLib.Test", "WeebreeOpen.FtpClientLib.Test\WeebreeOpen.FtpClientLib.Test.csproj", "{7DB1BB99-CCE4-4226-AF45-00475E9463D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeebreeOpen.FtpClientLib.Tests", "WeebreeOpen.FtpClientLib.Test\WeebreeOpen.FtpClientLib.Tests.csproj", "{7DB1BB99-CCE4-4226-AF45-00475E9463D0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E7ECE1E5-60C5-4088-9B74-AF6422E33425}"
 	ProjectSection(SolutionItems) = preProject

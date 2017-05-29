@@ -102,7 +102,7 @@ namespace WeebreeOpen.FtpClientLib.Service
         /// <returns>true if directory does exist, false if not.</returns>
         public bool DirectoryExists(string directoryPath)
         {
-            directoryPath = AdjustDir(directoryPath);
+            directoryPath = AdjustDirectory(directoryPath);
 
             // Perform create
             string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + directoryPath;
@@ -129,7 +129,7 @@ namespace WeebreeOpen.FtpClientLib.Service
         /// <returns>true if directory was created, false if not.</returns>
         public bool CreateDirectory(string directoryPath)
         {
-            directoryPath = AdjustDir(directoryPath);
+            directoryPath = AdjustDirectory(directoryPath);
 
             // Perform create
             string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + directoryPath;
@@ -154,7 +154,7 @@ namespace WeebreeOpen.FtpClientLib.Service
         public bool DeleteDirectory(string directoryPath)
         {
             // Perform remove
-            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(directoryPath);
+            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDirectory(directoryPath);
             FtpWebRequest ftp = GetRequest(uri);
 
             // Set request to RmDir
@@ -222,7 +222,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             StringBuilder ftpWebResponseString = new StringBuilder();
 
             FtpWebRequest ftpWebRequest;
-            ftpWebRequest = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(directoryPath)));
+            ftpWebRequest = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDirectory(directoryPath)));
             ftpWebRequest.UseBinary = true;
             ftpWebRequest.Credentials = new NetworkCredential(this.FtpClientConnection.UserName, this.FtpClientConnection.Password);
             ftpWebRequest.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
@@ -449,7 +449,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             else if (filePathSource.Contains("/"))
             {
                 // Treat as a full path
-                source = AdjustDir(filePathSource);
+                source = AdjustFile(filePathSource);
             }
             else
             {
@@ -534,6 +534,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             {
                 throw (new ApplicationException("File " + filePathSource + " not found"));
             }
+
             // Copy to FI
             FileInfo fi = new FileInfo(filePathSource);
             return UploadFile(fi, filePathTarget);
@@ -559,7 +560,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             else if (filePathTarget.Contains("/"))
             {
                 // If contains / treat as a full path
-                target = AdjustDir(filePathTarget);
+                target = AdjustFile(filePathTarget);
             }
             else
             {
@@ -612,13 +613,11 @@ namespace WeebreeOpen.FtpClientLib.Service
                     fs.Close();
                     OnRaiseFtpServiceEvent(FtpServiceEventArgs.FileUpload(fileInfoSource.FullName, filePathTarget));
                 }
-
             }
 
 
             ftp = null;
             return true;
-
         }
 
         #endregion
@@ -781,17 +780,30 @@ namespace WeebreeOpen.FtpClientLib.Service
             return null;
         }
 
-        private string AdjustDir(string path)
+        private string AdjustDirectory(string path)
         {
-            // Add [/] if missing
-            return ((path.StartsWith("/")) ? "" : "/").ToString() + path;
+            // Add [/] if missing at the beginning
+            path = ((path.StartsWith("/")) ? "" : "/").ToString() + path;
+
+            // Add [/] if missing at the end
+            path = path + ((path.EndsWith("/")) ? "" : "/").ToString();
+
+            return path;
+        }
+
+        private string AdjustFile(string path)
+        {
+            // Add [/] if missing at the beginning
+            path = ((path.StartsWith("/")) ? "" : "/").ToString() + path;
+
+            return path;
         }
 
         private string GetFullPath(string file)
         {
             if (file.Contains("/"))
             {
-                return AdjustDir(file);
+                return AdjustFile(file);
             }
             else
             {

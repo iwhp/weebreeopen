@@ -4,12 +4,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("WeebreeOpen.FtpClientLib.Test")]
-[assembly: AssemblyDescription("Release Date: 2015-07-25")]
+[assembly: AssemblyTitle("WeebreeOpen.FtpClientLib.Tests")]
+[assembly: AssemblyDescription("Release Date: 2017-05-29")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Weebree - Liechtenstein")]
-[assembly: AssemblyProduct("WeebreeOpen.FtpClientLib.Test")]
-[assembly: AssemblyCopyright("Copyright © 2015 Weebree")]
+[assembly: AssemblyProduct("WeebreeOpen.FtpClientLib.Tests")]
+[assembly: AssemblyCopyright("Copyright © 2017 Weebree")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
