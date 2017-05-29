@@ -1,13 +1,13 @@
-﻿namespace WeebreeOpen.FtpClientLib.Test.Service
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using WeebreeOpen.FtpClientLib.Model;
-    using WeebreeOpen.FtpClientLib.Service;
-    using WeebreeOpen.FtpClientLib.Test.Test;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using WeebreeOpen.FtpClientLib.Model;
+using WeebreeOpen.FtpClientLib.Service;
+using WeebreeOpen.FtpClientLib.Test.Test;
 
+namespace WeebreeOpen.FtpClientLib.Test.Service
+{
     [TestClass]
     public class FtpClientServiceTest
     {
@@ -141,6 +141,42 @@
         #endregion
 
         #region Directory Create / Delete
+
+        [TestMethod]
+        public void FtpClientService_Directory_Exists_true()
+        {
+            // Assign
+            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
+            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
+            sut.CreateDirectory(TestSetupCleanup.FtpTestRootFolder);
+
+            // Act
+            bool result = sut.DirectoryExists(TestSetupCleanup.FtpTestRootFolder);
+
+            // Assert
+            Assert.AreEqual<bool>(true, result);
+
+            // Clean
+            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
+        }
+
+        [TestMethod]
+        public void FtpClientService_Directory_Exists_false()
+        {
+            // Assign
+            FtpClientService sut = new FtpClientService(TestSetupCleanup.FtpClientConnection);
+            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
+            sut.CreateDirectory(TestSetupCleanup.FtpTestRootFolder);
+
+            // Act
+            bool result = sut.DirectoryExists(TestSetupCleanup.FtpDirectory1);
+
+            // Assert
+            Assert.AreEqual<bool>(false, result);
+
+            // Clean
+            sut.DeleteDirectoryRecursive(TestSetupCleanup.FtpTestRootFolder);
+        }
 
         [TestMethod]
         public void FtpClientService_Directory_Create()

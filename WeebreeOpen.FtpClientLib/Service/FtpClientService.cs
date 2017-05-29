@@ -14,13 +14,14 @@ namespace WeebreeOpen.FtpClientLib.Service
     {
         #region Constructors
 
-        private FtpClientService()
+        private FtpClientService(bool isThrowException)
         {
             this.EventMessages = new List<FtpServiceEventArgs>();
+            this.IsThrowException = isThrowException;
         }
 
-        public FtpClientService(string serverNameOrIp, string userName, string password)
-            : this()
+        public FtpClientService(string serverNameOrIp, string userName, string password, bool isThrowException = true)
+            : this(isThrowException)
         {
             if (serverNameOrIp == null) { throw new ArgumentNullException("serverNameOrIp"); }
             if (userName == null) { throw new ArgumentNullException("userName"); }
@@ -29,8 +30,8 @@ namespace WeebreeOpen.FtpClientLib.Service
             this.FtpClientConnection = new FtpClientConnection(serverNameOrIp, userName, password);
         }
 
-        public FtpClientService(FtpClientConnection connection)
-            : this()
+        public FtpClientService(FtpClientConnection connection, bool isThrowException = true)
+            : this(isThrowException)
         {
             if (connection == null) { throw new ArgumentNullException("connection"); }
 
@@ -41,10 +42,6 @@ namespace WeebreeOpen.FtpClientLib.Service
 
         #region Properties
 
-        public List<FtpServiceEventArgs> EventMessages { get; set; }
-
-        public FtpClientConnection FtpClientConnection { get; private set; }
-
         /// <summary>
         /// List of REGEX formats for different FTP server listing formats.
         /// </summary>
@@ -52,19 +49,30 @@ namespace WeebreeOpen.FtpClientLib.Service
         {
             // UNIX/LINUX
             @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})\s+\d+\s+\w+\s+\w+\s+(?<size>\d+)\s+(?<timestamp>\w+\s+\d+\s+\d{4})\s+(?<filename>.+)",
+
             // UNIX/LINUX
             @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})\s+\d+\s+\d+\s+(?<size>\d+)\s+(?<timestamp>\w+\s+\d+\s+\d{4})\s+(?<filename>.+)",
+
             // UNIX/LINUX
             @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})\s+\d+\s+\d+\s+(?<size>\d+)\s+(?<timestamp>\w+\s+\d+\s+\d{1,2}:\d{2})\s+(?<filename>.+)",
-            // ???
+
+            // ??? (ERNi DRUCK)
             // Processing: drwxrwxrwx               folder        0 May 29 19:22 TestDir1
             @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})\s+folder\s+(?<size>\d+)\s+(?<timestamp>\w+\s+\d+\s+\d{1,2}:\d{2})\s+(?<filename>.+)",
+
             // MS FTP in detailed mode
             @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})\s+\d+\s+\w+\s+\w+\s+(?<size>\d+)\s+(?<timestamp>\w+\s+\d+\s+\d{1,2}:\d{2})\s+(?<filename>.+)",
             @"(?<dir>[\-d])(?<permission>([\-r][\-w][\-xs]){3})(\s+)(?<size>(\d+))(\s+)(?<ctbit>(\w+\s\w+))(\s+)(?<size2>(\d+))\s+(?<timestamp>\w+\s+\d+\s+\d{2}:\d{2})\s+(?<filename>.+)",
+
             // MS FTP in 'DOS' mode
             @"(?<timestamp>\d{2}\-\d{2}\-\d{2}\s+\d{2}:\d{2}[Aa|Pp][mM])\s+(?<dir>\<\w+\>){0,1}(?<size>\d+){0,1}\s+(?<filename>.+)"
         };
+
+        private bool IsThrowException { get; set; } = true;
+
+        public List<FtpServiceEventArgs> EventMessages { get; set; }
+
+        public FtpClientConnection FtpClientConnection { get; private set; }
 
         #endregion
 
@@ -81,6 +89,111 @@ namespace WeebreeOpen.FtpClientLib.Service
             {
                 handler(this, e);
             }
+        }
+
+        #endregion
+
+        #region Directory Exists, Create, Delete
+
+        /// <summary>
+        /// Verifies if a directory does exist.
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        /// <returns>true if directory does exist, false if not.</returns>
+        public bool DirectoryExists(string directoryPath)
+        {
+            directoryPath = AdjustDir(directoryPath);
+
+            // Perform create
+            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + directoryPath;
+            FtpWebRequest ftp = GetRequest(uri);
+
+            // Set request to MkDir
+            ftp.Method = WebRequestMethods.Ftp.ListDirectory;
+            try
+            {
+                // Get response but ignore it
+                string str = GetStringResponse(ftp);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Will create one new directory.
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        /// <returns>true if directory was created, false if not.</returns>
+        public bool CreateDirectory(string directoryPath)
+        {
+            directoryPath = AdjustDir(directoryPath);
+
+            // Perform create
+            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + directoryPath;
+            FtpWebRequest ftp = GetRequest(uri);
+
+            // Set request to MkDir
+            ftp.Method = WebRequestMethods.Ftp.MakeDirectory;
+            try
+            {
+                // Get response but ignore it
+                string str = GetStringResponse(ftp);
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.DirectoryCreate(directoryPath));
+            }
+            catch (Exception ex)
+            {
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not create directory: [{0}].", directoryPath), ex));
+                return false;
+            }
+            return true;
+        }
+
+        public bool DeleteDirectory(string directoryPath)
+        {
+            // Perform remove
+            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(directoryPath);
+            FtpWebRequest ftp = GetRequest(uri);
+
+            // Set request to RmDir
+            ftp.Method = WebRequestMethods.Ftp.RemoveDirectory;
+            try
+            {
+                // Get response but ignore it
+                string str = GetStringResponse(ftp);
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.DirectoryDelete(directoryPath));
+            }
+            catch (Exception ex)
+            {
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not delete directory: [{0}].", directoryPath), ex));
+                return false;
+            }
+            return true;
+        }
+
+        public bool DeleteDirectoryRecursive(string directoryPath)
+        {
+            // Delete all entries within the directory
+            List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(directoryPath);
+
+            foreach (FtpEntry ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
+            {
+                if (ftpEntry.FtpEntryType == FtpEntryType.File)
+                {
+                    bool isFileDeleteOK = DeleteFile(ftpEntry.DirectoryPath);
+                    if (!isFileDeleteOK) { return false; }
+                }
+                else
+                {
+                    bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.DirectoryPath);
+                    if (!isDirectoryDeleteOK) { return false; }
+                }
+            }
+
+            // Delete the directory requested
+            return DeleteDirectory(directoryPath);
         }
 
         #endregion
@@ -231,86 +344,6 @@ namespace WeebreeOpen.FtpClientLib.Service
                     //YearTime = timeYear
                 };
             }
-        }
-
-        #endregion
-
-        #region Directory Create, Delete
-
-        /// <summary>
-        /// Will create one new directory.
-        /// </summary>
-        /// <param name="directoryPath"></param>
-        /// <returns>true if directory was created, false if not.</returns>
-        public bool CreateDirectory(string directoryPath)
-        {
-            directoryPath = AdjustDir(directoryPath);
-
-            string[] directoryPaths = directoryPath.Split('/');
-
-            // Perform create
-            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + directoryPath;
-            FtpWebRequest ftp = GetRequest(uri);
-
-            // Set request to MkDir
-            ftp.Method = WebRequestMethods.Ftp.MakeDirectory;
-            try
-            {
-                // Get response but ignore it
-                string str = GetStringResponse(ftp);
-                OnRaiseFtpServiceEvent(FtpServiceEventArgs.DirectoryCreate(directoryPath));
-            }
-            catch (Exception ex)
-            {
-                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not create directory: [{0}].", directoryPath), ex));
-                return false;
-            }
-            return true;
-        }
-
-        public bool DeleteDirectory(string directoryPath)
-        {
-            // Perform remove
-            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDir(directoryPath);
-            FtpWebRequest ftp = GetRequest(uri);
-
-            // Set request to RmDir
-            ftp.Method = WebRequestMethods.Ftp.RemoveDirectory;
-            try
-            {
-                // Get response but ignore it
-                string str = GetStringResponse(ftp);
-                OnRaiseFtpServiceEvent(FtpServiceEventArgs.DirectoryDelete(directoryPath));
-            }
-            catch (Exception ex)
-            {
-                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not delete directory: [{0}].", directoryPath), ex));
-                return false;
-            }
-            return true;
-        }
-
-        public bool DeleteDirectoryRecursive(string directoryPath)
-        {
-            // Delete all entries within the directory
-            List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(directoryPath);
-
-            foreach (FtpEntry ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
-            {
-                if (ftpEntry.FtpEntryType == FtpEntryType.File)
-                {
-                    bool isFileDeleteOK = DeleteFile(ftpEntry.DirectoryPath);
-                    if (!isFileDeleteOK) { return false; }
-                }
-                else
-                {
-                    bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.DirectoryPath);
-                    if (!isDirectoryDeleteOK) { return false; }
-                }
-            }
-
-            // Delete the directory requested
-            return DeleteDirectory(directoryPath);
         }
 
         #endregion
