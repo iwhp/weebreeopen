@@ -10,6 +10,7 @@ namespace WeebreeOpen.FtpClientLib.Test
     {
         #region Properties
 
+        public static FtpClientService FtpClientService { get; private set; }
         public static FtpClientConnection FtpClientConnection { get; private set; }
 
         public static string TestDataFileText1 = @"TestData\testfile1-text.txt";
@@ -35,13 +36,16 @@ namespace WeebreeOpen.FtpClientLib.Test
         [AssemblyInitialize]
         public void AssemblyInitialize()
         {
-            TestBase.FtpClientConnection = new FtpClientConnection("xxx", @"xxx", "xxx");
         }
 
         [TestInitialize]
         public void TestInitialize()
         {
-            TestBase.FtpClientConnection = new FtpClientConnection("xxx", @"xxx", "xxx");
+            // Activate one of the following connection string
+            TestBase.FtpClientConnection = new FtpClientConnection("xxx.ernidruck.xxx", "xxx", "xxx");
+            TestBase.FtpClientConnection = new FtpClientConnection("xxx.ardimedia.xxx", "xxx", "xxx");
+            TestBase.FtpClientService = new FtpClientService(TestBase.FtpClientConnection);
+
             TestBase.CreateTestEnvironment();
         }
 
@@ -56,27 +60,27 @@ namespace WeebreeOpen.FtpClientLib.Test
             {
                 Directory.Delete(TestBase.LocalTestRootFolder, true);
             }
+
+            // Prepare local file system
             Directory.CreateDirectory(TestBase.LocalTestRootFolder);
             File.Copy(TestBase.TestDataFileText1, TestBase.LocalFileText1);
             File.Copy(TestBase.TestDataFileBinary1, TestBase.LocalFileBinary1);
 
-            FtpClientService ftpClientService = new FtpClientService(TestBase.FtpClientConnection);
+            // Prepare FTP server: Delete all
+            TestBase.FtpClientService.DeleteDirectoryRecursive(TestBase.FtpTestRootFolder);
 
-            // Delete all
-            ftpClientService.DeleteDirectoryRecursive(TestBase.FtpTestRootFolder);
+            // Prepare FTP server: Create root directory
+            TestBase.FtpClientService.CreateDirectory(TestBase.FtpTestRootFolder);
 
-            // Create root directory
-            ftpClientService.CreateDirectory(TestBase.FtpTestRootFolder);
+            // Prepare FTP server: Create subdirectories
+            TestBase.FtpClientService.CreateDirectory(TestBase.FtpDirectory1);
+            TestBase.FtpClientService.CreateDirectory(TestBase.FtpDirectory2);
 
-            // Create subdirectories
-            ftpClientService.CreateDirectory(TestBase.FtpDirectory1);
-            ftpClientService.CreateDirectory(TestBase.FtpDirectory2);
-
-            // Add test files
-            ftpClientService.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText1);
-            ftpClientService.UploadFile(TestBase.TestDataFileBinary1, TestBase.FtpFileBinary1);
-            ftpClientService.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText3);
-            ftpClientService.UploadFile(TestBase.TestDataFileBinary1, TestBase.FtpFileBinary4);
+            // Prepare FTP server: Add test files
+            TestBase.FtpClientService.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText1);
+            TestBase.FtpClientService.UploadFile(TestBase.TestDataFileBinary1, TestBase.FtpFileBinary1);
+            TestBase.FtpClientService.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText3);
+            TestBase.FtpClientService.UploadFile(TestBase.TestDataFileBinary1, TestBase.FtpFileBinary4);
         }
 
         #endregion
@@ -91,10 +95,12 @@ namespace WeebreeOpen.FtpClientLib.Test
                 return;
             }
 
+            // Delete local file system
             Directory.Delete(TestBase.LocalTestRootFolder, true);
 
+            // Delete FTP server
             FtpClientService ftpClientService = new FtpClientService(TestBase.FtpClientConnection);
-            ftpClientService.DeleteDirectoryRecursive(TestBase.FtpTestRootFolder);
+            TestBase.FtpClientService.DeleteDirectoryRecursive(TestBase.FtpTestRootFolder);
         }
 
         #endregion

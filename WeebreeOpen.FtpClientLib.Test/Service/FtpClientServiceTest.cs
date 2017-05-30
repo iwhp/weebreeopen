@@ -30,7 +30,7 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual<int>(6, result.Count, "We assume that there are 4 files and 2 directories on the FTP server in the root test directory.");
+            Assert.AreEqual<int>(4, result.Count, "We assume that there are 2 files and 2 directories on the FTP server in the root test directory.");
         }
 
         #endregion
