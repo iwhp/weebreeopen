@@ -350,13 +350,13 @@ namespace WeebreeOpen.FtpClientLib.Service
 
         #region File Download
 
-        public bool DownloadFile(string filePathSource, string filePathTarget, bool overrideExisting, DateTime? setDateTimeForFile = null)
+        public bool DownloadFile(string filePathSource, string filePathTarget, bool isOverrideExisting, DateTime? setDateTimeForFile = null)
         {
             FileInfo fi = new FileInfo(filePathTarget);
-            return this.DownloadFile(filePathSource, fi, overrideExisting, setDateTimeForFile);
+            return this.DownloadFile(filePathSource, fi, isOverrideExisting, setDateTimeForFile);
         }
 
-        public bool DownloadFileRecursive(string startingPathSource, string startingPathTarget, bool overrideExisting = false, bool isDeleteSourceAfterDownload = false, bool isDeleteChildDirectories = false)
+        public bool DownloadFileRecursive(string startingPathSource, string startingPathTarget, bool isOverrideExisting = false, bool isDeleteSourceAfterDownload = false, bool isDeleteChildDirectories = false)
         {
             List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(startingPathSource);
 
@@ -394,8 +394,7 @@ namespace WeebreeOpen.FtpClientLib.Service
                 bool isFileDownloadOK = true;
                 if (ftpEntry.FtpEntryType == FtpEntryType.File)
                 {
-                    Console.WriteLine(ftpEntry.DateTime);
-                    isFileDownloadOK = DownloadFile(ftpEntry.DirectoryPath, targetFilePath, overrideExisting, ftpEntry.DateTime);
+                    isFileDownloadOK = DownloadFile(ftpEntry.DirectoryPath, targetFilePath, isOverrideExisting, ftpEntry.DateTime);
                 }
 
                 if (isFileDownloadOK)
@@ -435,10 +434,10 @@ namespace WeebreeOpen.FtpClientLib.Service
             return true;
         }
 
-        private bool DownloadFile(string filePathSource, FileInfo fileInfoTarget, bool overrideExisting, DateTime? setDateTimeForFile = null)
+        private bool DownloadFile(string filePathSource, FileInfo fileInfoTarget, bool isOverrideExisting, DateTime? setDateTimeForFile = null)
         {
             // 1. check target
-            if (fileInfoTarget.Exists && !(overrideExisting))
+            if (fileInfoTarget.Exists && !(isOverrideExisting))
             {
                 throw (new ApplicationException("Target file already exists"));
             }

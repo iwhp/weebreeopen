@@ -27,7 +27,7 @@
 
     D:
     CD \CODE\Git.Github\iwhp\weebreeopen\WeebreeOpen.FtpClientLib
-    C:\APP\NuGet\nuget push WeebreeOpen.FtpClientLib.0.0.23-beta.nupkg -Source https://www.nuget.org/api/v2/package
+    C:\APP\NuGet\nuget push WeebreeOpen.FtpClientLib.0.0.24-beta.nupkg -Source https://www.nuget.org/api/v2/package
 
 
 # LINKS
