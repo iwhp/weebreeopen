@@ -356,7 +356,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             return this.DownloadFile(filePathSource, fi, overrideExisting, setDateTimeForFile);
         }
 
-        public bool DownloadFileRecursive(string startingPathSource, string startingPathTarget, bool overrideExisting = false, bool deleteSourceAfterDownload = false)
+        public bool DownloadFileRecursive(string startingPathSource, string startingPathTarget, bool overrideExisting = false, bool isDeleteSourceAfterDownload = false, bool isDeleteChildDirectories = false)
         {
             List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(startingPathSource);
 
@@ -400,7 +400,7 @@ namespace WeebreeOpen.FtpClientLib.Service
 
                 if (isFileDownloadOK)
                 {
-                    if (deleteSourceAfterDownload)
+                    if (isDeleteSourceAfterDownload)
                     {
                         if (ftpEntry.FtpEntryType == FtpEntryType.File)
                         {
@@ -413,12 +413,15 @@ namespace WeebreeOpen.FtpClientLib.Service
                         }
                         else
                         {
-                            // Delete Directory (if not empty, it will not be deleted (return code = false))
-                            bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.DirectoryPath);
-                            if (!isDirectoryDeleteOK)
+                            if (isDeleteChildDirectories)
                             {
-                                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("During coping file could not delete directory (direcctory no empty?): [{0}].", ftpEntry.DirectoryPath)));
-                                return false;
+                                // Delete Directory (if not empty, it will not be deleted (return code = false))
+                                bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.DirectoryPath);
+                                if (!isDirectoryDeleteOK)
+                                {
+                                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("During coping file could not delete directory (direcctory no empty?): [{0}].", ftpEntry.DirectoryPath)));
+                                    return false;
+                                }
                             }
                         }
                     }
