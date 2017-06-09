@@ -529,17 +529,31 @@ namespace WeebreeOpen.FtpClientLib.Service
         /// <remarks>If the target filename is blank, the source filename is used
         /// (assumes current directory). Otherwise use a filename to specify a name
         /// or a full path and filename if required.</remarks>
-        public bool UploadFile(string filePathSource, string filePathTarget)
+        public bool UploadFile(string filePathSource, string filePathTarget, bool isOverrideExisting = false, bool isDeleteSourceAfterDownload = false)
         {
-            // 1. check source
+            filePathTarget = AdjustFile(filePathTarget);
+
+            // Check if source exists
             if (!File.Exists(filePathSource))
             {
                 throw (new ApplicationException("File " + filePathSource + " not found"));
             }
 
+            // Check if target exists and should be deleted
+            if (FileExists(filePathTarget) && isOverrideExisting)
+            {
+                DeleteFile(filePathTarget);
+            }
+
             // Copy to FI
             FileInfo fi = new FileInfo(filePathSource);
-            return UploadFile(fi, filePathTarget);
+            bool result = UploadFile(fi, filePathTarget);
+
+            if (result && isDeleteSourceAfterDownload)
+            {
+                fi.Delete();
+            }
+            return result;
         }
 
         /// <summary>
@@ -550,6 +564,8 @@ namespace WeebreeOpen.FtpClientLib.Service
         /// <returns></returns>
         private bool UploadFile(FileInfo fileInfoSource, string filePathTarget)
         {
+            filePathTarget = AdjustFile(filePathTarget);
+
             // Copy the file specified to target file: target file can be full path or just filename (uses current dir)
 
             // 1. check target
@@ -570,10 +586,10 @@ namespace WeebreeOpen.FtpClientLib.Service
                 target = filePathTarget;
             }
 
-            string URI = "ftp://" + this.FtpClientConnection.ServerNameOrIp + target;
+            string Uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + target;
 
             // Perform copy
-            FtpWebRequest ftp = GetRequest(URI);
+            FtpWebRequest ftp = GetRequest(Uri);
 
             // Set request to upload a file in binary
             ftp.Method = WebRequestMethods.Ftp.UploadFile;
@@ -617,7 +633,6 @@ namespace WeebreeOpen.FtpClientLib.Service
                 }
             }
 
-
             ftp = null;
             return true;
         }
@@ -653,6 +668,28 @@ namespace WeebreeOpen.FtpClientLib.Service
             }
 
             return true;
+        }
+
+        #endregion
+
+        #region File Exits
+
+        public bool FileExists(string filePath)
+        {
+            // Prepare FtpWebRequest
+            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + GetFullPath(filePath);
+            FtpWebRequest ftp = GetRequest(uri);
+            ftp.Method = WebRequestMethods.Ftp.GetFileSize; // Set request to get size
+
+            try
+            {
+                GetStringResponse(ftp);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         #endregion
@@ -795,6 +832,12 @@ namespace WeebreeOpen.FtpClientLib.Service
 
         private string AdjustFile(string path)
         {
+            // If [\] in path, replace with [/]
+            if (path.Contains(@"\"))
+            {
+                path = path.Replace(@"\", "/");
+            }
+
             // Add [/] if missing at the beginning
             path = ((path.StartsWith("/")) ? "" : "/").ToString() + path;
 

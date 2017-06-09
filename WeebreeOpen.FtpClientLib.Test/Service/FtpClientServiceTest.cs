@@ -122,6 +122,38 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
             Assert.AreEqual<bool>(true, result);
         }
 
+        [TestMethod]
+        public void FtpClientService_FileUpload_BackSlash()
+        {
+            // Assign
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            TestBase.FtpFileText1 = TestBase.FtpFileText1.Replace("/", @"\"); // Simulate a "Windows file path"
+
+            // Act
+            bool result = sut.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText1);
+
+            // Assert
+            Assert.AreEqual<bool>(true, result);
+
+            // Fix
+            TestBase.FtpFileText1 = TestBase.FtpFileText1.Replace(@"\", "/");
+        }
+
+        [TestMethod]
+        public void FtpClientService_FileUpload_Override()
+        {
+            // Assign
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+
+            // Act
+            bool result1 = sut.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText1);
+            bool result2 = sut.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText1);
+
+            // Assert
+            Assert.AreEqual<bool>(true, result1);
+            Assert.AreEqual<bool>(true, result2);
+        }
+
         #endregion
 
         #region FileDelete

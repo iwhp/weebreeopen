@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using WeebreeOpen.FtpClientLib.Model;
 using WeebreeOpen.FtpClientLib.Service;
@@ -6,6 +7,7 @@ using WeebreeOpen.FtpClientLib.Service;
 namespace WeebreeOpen.FtpClientLib.Test
 {
     [DeploymentItem(@"TestData", @"TestData")]
+    [DebuggerStepThrough]
     public abstract class TestBase
     {
         #region Properties
