@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using WeebreeOpen.FtpClientLib.Model;
@@ -16,13 +17,20 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_GetDirectoryListing()
         {
             // Assign
+            TestBase.SetupFtpCreateDirectory1();
+            TestBase.SetupFtpCreateDirectory2();
+            TestBase.SetupFtpCopyFileText1();
+            TestBase.SetupFtpCopyFileText2();
+            TestBase.SetupFtpCopyFileBinary1();
+            TestBase.SetupFtpCopyFileBinary2();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
-            TestBase.CreateTestEnvironment();
 
             // Act
-            List<FtpEntry> result = sut.GetDirectoryListing(TestBase.FtpTestRootFolder).ToList();
+            List<FtpEntry> result = sut.GetDirectoryListing(TestBase.FtpRootPath).ToList();
 
             // Log
+            this.LogEventMessages(sut);
+
             foreach (FtpEntry ftpEntry in result)
             {
                 Console.WriteLine(ftpEntry);
@@ -41,12 +49,20 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_GetDirectoryListingRecursive()
         {
             // Assign
+            TestBase.SetupFtpCreateDirectory1();
+            TestBase.SetupFtpCreateDirectory2();
+            TestBase.SetupFtpCopyFileText1();
+            TestBase.SetupFtpCopyFileText2();
+            TestBase.SetupFtpCopyFileBinary1();
+            TestBase.SetupFtpCopyFileBinary2();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
-            List<FtpEntry> result = sut.GetDirectoryListingRecursive(TestBase.FtpTestRootFolder).ToList();
+            List<FtpEntry> result = sut.GetDirectoryListingRecursive(TestBase.FtpRootPath).ToList();
 
             // Log
+            this.LogEventMessages(sut);
+
             foreach (FtpEntry ftpEntry in result)
             {
                 Console.WriteLine(ftpEntry);
@@ -65,27 +81,38 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileDownload_TextFile()
         {
             // Assign
+            TestBase.SetupFtpCopyFileText1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathText1));
 
             // Act
-            bool result = sut.DownloadFile(TestBase.FtpFileText1, TestBase.LocalFileText1, true);
+            bool result = sut.DownloadFile(TestBase.FtpFilePathText1, TestBase.FileSystemPathText1, false);
+
+            // Log
+            this.LogEventMessages(sut);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
+            Assert.AreEqual<bool>(true, File.Exists(TestBase.FileSystemPathText1));
         }
 
         [TestMethod]
         public void FtpClientService_FileDownload_BinaryFile()
         {
             // Assign
+            TestBase.SetupFtpCopyFileBinary1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
-            TestBase.CreateTestEnvironment();
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathBinary1));
 
             // Act
-            bool result = sut.DownloadFile(TestBase.FtpFileBinary1, TestBase.LocalFileBinary1, true);
+            bool result = sut.DownloadFile(TestBase.FtpFilePathBinary1, TestBase.FileSystemPathBinary1, false);
+
+            // Log
+            this.LogEventMessages(sut);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
+            Assert.AreEqual<bool>(true, File.Exists(TestBase.FileSystemPathBinary1));
         }
 
         #endregion
@@ -96,13 +123,30 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileDownloadRecursive()
         {
             // Assign
+            TestBase.SetupFtpCreateDirectory1();
+            TestBase.SetupFtpCreateDirectory2();
+            TestBase.SetupFtpCopyFileText1();
+            TestBase.SetupFtpCopyFileText2();
+            TestBase.SetupFtpCopyFileBinary1();
+            TestBase.SetupFtpCopyFileBinary2();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathText1));
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathBinary1));
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathText2));
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathBinary2));
 
             // Act
-            bool result = sut.DownloadFileRecursive(TestBase.FtpTestRootFolder, TestBase.LocalTestRootFolder, true, false);
+            bool result = sut.DownloadFileRecursive(TestBase.FtpRootPath, TestBase.FileSystemRootPath, true, false);
+
+            // Log
+            this.LogEventMessages(sut);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
+            Assert.AreEqual<bool>(true, File.Exists(TestBase.FileSystemPathText1));
+            Assert.AreEqual<bool>(true, File.Exists(TestBase.FileSystemPathText2));
+            Assert.AreEqual<bool>(true, File.Exists(TestBase.FileSystemPathBinary1));
+            Assert.AreEqual<bool>(true, File.Exists(TestBase.FileSystemPathBinary2));
         }
 
         #endregion
@@ -110,16 +154,102 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         #region FileUpload
 
         [TestMethod]
-        public void FtpClientService_FileUpload()
+        public void FtpClientService_FileUpload_FileText1_DoNotDelete()
+        {
+            // Assign
+            TestBase.SetupFileSystemCopyFileText1();
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            Assert.IsTrue(File.Exists(TestBase.FileSystemPathText1));
+
+            // Act
+            bool result = sut.UploadFile(TestBase.FileSystemPathText1, TestBase.FtpFilePathText1, isDeleteSourceAfterUpload: false);
+
+            // Log
+            this.LogEventMessages(sut);
+
+            // Assert
+            Assert.AreEqual<bool>(true, result);
+            Assert.AreEqual<int>(1, sut.EventMessages.Count);
+            Assert.IsTrue(File.Exists(TestBase.FileSystemPathText1));
+        }
+
+        [TestMethod]
+        public void FtpClientService_FileUpload_FileText1_Delete()
+        {
+            // Assign
+            TestBase.SetupFileSystemCopyFileText1();
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            Assert.IsTrue(File.Exists(TestBase.FileSystemPathText1));
+
+            // Act
+            bool result = sut.UploadFile(TestBase.FileSystemPathText1, TestBase.FtpFilePathText1, isDeleteSourceAfterUpload: true);
+
+            // Log
+            this.LogEventMessages(sut);
+
+            // Assert
+            Assert.AreEqual<bool>(true, result);
+            Assert.AreEqual<int>(1, sut.EventMessages.Count);
+            Assert.IsFalse(File.Exists(TestBase.FileSystemPathText1));
+        }
+
+        [TestMethod]
+        public void FtpClientService_FileUpload_FileText1_AlreadyExists()
+        {
+            // Assign
+            TestBase.SetupFtpCopyFileText1();
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+
+            // Act
+            try
+            {
+                bool result = sut.UploadFile(TestBase.TestDataPathText1, TestBase.FtpFilePathText1);
+
+                // Assert
+                Assert.Fail("UploadFile should throw an Exception, since file already exists and override not specified.");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("already exists and override not request. Either delete by hand or set"));
+            }
+
+            // Log
+            this.LogEventMessages(sut);
+        }
+
+        [TestMethod]
+        public void FtpClientService_FileUpload_FileText1_AlreadyExists_Override()
+        {
+            // Assign
+            TestBase.SetupFtpCopyFileText1();
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+
+            // Act
+            bool result = sut.UploadFile(TestBase.TestDataPathText1, TestBase.FtpFilePathText1, isOverrideExisting: true);
+
+            // Log
+            this.LogEventMessages(sut);
+
+            // Assert
+            Assert.AreEqual<bool>(true, result);
+            Assert.AreEqual<int>(2, sut.EventMessages.Count);
+        }
+
+        [TestMethod]
+        public void FtpClientService_FileUpload_FileBinary1()
         {
             // Assign
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
-            bool result = sut.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText1);
+            bool result = sut.UploadFile(TestBase.TestDataPathBinary1, TestBase.FtpFilePathBinary1);
+
+            // Log
+            this.LogEventMessages(sut);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
+            Assert.AreEqual<int>(1, sut.EventMessages.Count);
         }
 
         [TestMethod]
@@ -127,31 +257,19 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         {
             // Assign
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
-            TestBase.FtpFileText1 = TestBase.FtpFileText1.Replace("/", @"\"); // Simulate a "Windows file path"
+            TestBase.FtpFilePathText1 = TestBase.FtpFilePathText1.Replace("/", @"\"); // Simulate a "Windows file path"
 
             // Act
-            bool result = sut.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText1);
+            bool result = sut.UploadFile(TestBase.TestDataPathText1, TestBase.FtpFilePathText1);
+
+            // Log
+            this.LogEventMessages(sut);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
 
             // Fix
-            TestBase.FtpFileText1 = TestBase.FtpFileText1.Replace(@"\", "/");
-        }
-
-        [TestMethod]
-        public void FtpClientService_FileUpload_Override()
-        {
-            // Assign
-            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
-
-            // Act
-            bool result1 = sut.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText1);
-            bool result2 = sut.UploadFile(TestBase.TestDataFileText1, TestBase.FtpFileText1);
-
-            // Assert
-            Assert.AreEqual<bool>(true, result1);
-            Assert.AreEqual<bool>(true, result2);
+            TestBase.FtpFilePathText1 = TestBase.FtpFilePathText1.Replace(@"\", "/");
         }
 
         #endregion
@@ -162,11 +280,14 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileDelete()
         {
             // Assign
+            TestBase.SetupFtpCopyFileText1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
-            TestBase.CreateTestEnvironment();
 
             // Act
-            bool result = sut.DeleteFile(TestBase.FtpFileText1);
+            bool result = sut.DeleteFile(TestBase.FtpFilePathText1);
+
+            // Log
+            this.LogEventMessages(sut);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -183,7 +304,10 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
-            bool result = sut.DirectoryExists(TestBase.FtpTestRootFolder);
+            bool result = sut.DirectoryExists(TestBase.FtpRootPath);
+
+            // Log
+            this.LogEventMessages(sut);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -194,10 +318,13 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         {
             // Assign
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
-            sut.DeleteDirectoryRecursive(TestBase.FtpTestRootFolder);
+            sut.DeleteDirectoryRecursive(TestBase.FtpRootPath);
 
             // Act
-            bool result = sut.DirectoryExists(TestBase.FtpDirectory1);
+            bool result = sut.DirectoryExists(TestBase.FtpDirectoryPath1);
+
+            // Log
+            this.LogEventMessages(sut);
 
             // Assert
             Assert.AreEqual<bool>(false, result);
@@ -208,10 +335,13 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         {
             // Assign
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
-            sut.DeleteDirectoryRecursive(TestBase.FtpDirectory1);
+            sut.DeleteDirectoryRecursive(TestBase.FtpDirectoryPath1);
 
             // Act
-            bool result = sut.CreateDirectory(TestBase.FtpDirectory1);
+            bool result = sut.CreateDirectory(TestBase.FtpDirectoryPath1);
+
+            // Log
+            this.LogEventMessages(sut);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -221,10 +351,14 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_Directory_Create_Sub()
         {
             // Assign
+            TestBase.SetupFtpCreateDirectory1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
-            bool result = sut.CreateDirectory(TestBase.FtpDirectory1 + "subdir1/");
+            bool result = sut.CreateDirectory(TestBase.FtpDirectoryPath1 + "/subdir1");
+
+            // Log
+            this.LogEventMessages(sut);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -235,11 +369,14 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         {
             // Assign
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
-            sut.DeleteDirectoryRecursive(TestBase.FtpDirectory1);
-            sut.CreateDirectory(TestBase.FtpDirectory1);
+            sut.DeleteDirectoryRecursive(TestBase.FtpDirectoryPath1);
+            sut.CreateDirectory(TestBase.FtpDirectoryPath1);
 
             // Act
-            bool result = sut.DeleteDirectory(TestBase.FtpDirectory1);
+            bool result = sut.DeleteDirectory(TestBase.FtpDirectoryPath1);
+
+            // Log
+            this.LogEventMessages(sut);
 
             // Assert
             Assert.AreEqual<bool>(true, result);
@@ -253,24 +390,27 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_DeleteDirectoryWithFile()
         {
             // Assign
+            TestBase.SetupFtpCreateDirectory1();
+            TestBase.SetupFtpCreateDirectory2();
+            TestBase.SetupFtpCopyFileText1();
+            TestBase.SetupFtpCopyFileText2();
+            TestBase.SetupFtpCopyFileBinary1();
+            TestBase.SetupFtpCopyFileBinary2();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
             sut.EventMessages.Clear();
-            bool result3 = sut.DeleteDirectory(TestBase.FtpDirectory1);
-            bool result4 = sut.DeleteFile(TestBase.FtpFileText3);
-            bool result5 = sut.DeleteDirectory(TestBase.FtpDirectory1);
-
-            // Assert
-            Assert.AreEqual<bool>(false, result3, "Directory was deleted - this should NOT be possible since there are files in the directory.");
-            Assert.AreEqual<bool>(true, result4, "File could not be deleted.");
-            Assert.AreEqual<bool>(true, result5, "Directory could not be deleted");
+            bool result1 = sut.DeleteDirectory(TestBase.FtpDirectoryPath1);
+            bool result2 = sut.DeleteFile(TestBase.FtpFilePathText2);
+            bool result3 = sut.DeleteDirectory(TestBase.FtpDirectoryPath1);
 
             // Log
-            foreach (FtpServiceEventArgs message in sut.EventMessages)
-            {
-                Console.WriteLine(message.ToString());
-            }
+            this.LogEventMessages(sut);
+
+            // Assert
+            Assert.AreEqual<bool>(false, result1, "Directory should not be delete, since there are files in the directory.");
+            Assert.AreEqual<bool>(true, result2, "File could not be deleted.");
+            Assert.AreEqual<bool>(true, result3, "Directory could not be deleted.");
         }
 
         #endregion
@@ -306,15 +446,17 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_BuildHtmlMessage_OK_1()
         {
             // Assign
-            List<FtpServiceEventArgs> input = new List<FtpServiceEventArgs>();
-            input.Add(FtpServiceEventArgs.Information("message"));
-            input.Add(FtpServiceEventArgs.DirectoryCreate("directory", "message"));
-            input.Add(FtpServiceEventArgs.DirectoryDelete("directory", "message"));
-            input.Add(FtpServiceEventArgs.Error("message", new Exception("exception")));
-            input.Add(FtpServiceEventArgs.FileDelete("file", "message"));
-            input.Add(FtpServiceEventArgs.FileDownload("fileFrom", "fileTO", "message"));
-            input.Add(FtpServiceEventArgs.FileUpload("fileFrom", "fileTo", "message"));
-            input.Add(FtpServiceEventArgs.Information("message"));
+            List<FtpServiceEventArgs> input = new List<FtpServiceEventArgs>
+            {
+                FtpServiceEventArgs.Information("message"),
+                FtpServiceEventArgs.DirectoryCreate("directory", "message"),
+                FtpServiceEventArgs.DirectoryDelete("directory", "message"),
+                FtpServiceEventArgs.Error("message", new Exception("exception")),
+                FtpServiceEventArgs.FileDelete("file", "message"),
+                FtpServiceEventArgs.FileDownload("fileFrom", "fileTO", "message"),
+                FtpServiceEventArgs.FileUpload("fileFrom", "fileTo", "message"),
+                FtpServiceEventArgs.Information("message")
+            };
 
             // Act
             string result = FtpClientService.BuildHtmlMessage(input);

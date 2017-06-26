@@ -56,16 +56,15 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="FtpClientSample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\FtpClientServiceTest.cs" />
     <Compile Include="TestBase.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="TestData\testfile1-text.txt">
+    <Content Include="TESTDATA\testfile1-text.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\testfile2-image.jpg">
+    <Content Include="TESTDATA\testfile2-image.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
