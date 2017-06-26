@@ -100,7 +100,7 @@ namespace WeebreeOpen.FtpClientLib.Service
         /// <returns>true if directory does exist, false if not.</returns>
         public bool DirectoryExists(string directoryPath)
         {
-            directoryPath = AdjustDirectory(directoryPath);
+            directoryPath = FixFtpDirectory(directoryPath);
 
             // Perform create
             string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + directoryPath;
@@ -127,7 +127,7 @@ namespace WeebreeOpen.FtpClientLib.Service
         /// <returns>true if directory was created, false if not.</returns>
         public bool CreateDirectory(string directoryPath)
         {
-            directoryPath = AdjustDirectory(directoryPath);
+            directoryPath = FixFtpDirectory(directoryPath);
 
             // Perform create
             string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + directoryPath;
@@ -152,7 +152,7 @@ namespace WeebreeOpen.FtpClientLib.Service
         public bool DeleteDirectory(string directoryPath)
         {
             // Perform remove
-            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDirectory(directoryPath);
+            string uri = "ftp://" + this.FtpClientConnection.ServerNameOrIp + FixFtpDirectory(directoryPath);
             FtpWebRequest ftp = GetRequest(uri);
 
             // Set request to RmDir
@@ -220,7 +220,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             StringBuilder ftpWebResponseString = new StringBuilder();
 
             FtpWebRequest ftpWebRequest;
-            ftpWebRequest = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + this.FtpClientConnection.ServerNameOrIp + AdjustDirectory(directoryPath)));
+            ftpWebRequest = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + this.FtpClientConnection.ServerNameOrIp + FixFtpDirectory(directoryPath)));
             ftpWebRequest.UseBinary = true;
             ftpWebRequest.Credentials = new NetworkCredential(this.FtpClientConnection.UserName, this.FtpClientConnection.Password);
             ftpWebRequest.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
@@ -358,7 +358,7 @@ namespace WeebreeOpen.FtpClientLib.Service
         {
             List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(startingPathSource);
 
-            System.IO.Directory.CreateDirectory(startingPathTarget);
+            Directory.CreateDirectory(startingPathTarget);
 
             // Copy all Files
             foreach (FtpEntry ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
@@ -382,7 +382,7 @@ namespace WeebreeOpen.FtpClientLib.Service
                     targetPath = targetFilePath;
                 }
 
-                if (AddSuffix(startingPathTarget, @"\") != AddSuffix(targetPath, @"\"))
+                if (FixSuffix(startingPathTarget, @"\") != FixSuffix(targetPath, @"\"))
                 {
                     DirectoryInfo directoryCreated = Directory.CreateDirectory(targetPath);
                     directoryCreated.CreationTime = ftpEntry.DateTime;
@@ -832,44 +832,30 @@ namespace WeebreeOpen.FtpClientLib.Service
             return null;
         }
 
-        private string AdjustDirectory(string path)
+        private string FixFtpDirectory(string ftpPath)
         {
+            ftpPath = ftpPath.Replace(@"\", "/");
+
             // Add [/] if missing at the beginning
-            path = ((path.StartsWith("/")) ? "" : "/").ToString() + path;
+            ftpPath = (ftpPath.StartsWith("/") ? "" : "/") + ftpPath;
 
             // Add [/] if missing at the end
-            path = path + ((path.EndsWith("/")) ? "" : "/").ToString();
+            ftpPath = ftpPath + (ftpPath.EndsWith("/") ? "" : "/");
 
-            return path;
+            return ftpPath;
         }
 
-        private string FixFtpPath(string path)
+        private string FixFtpPath(string ftpPath)
         {
-            // If [\] in path, replace with [/]
-            if (path.Contains(@"\"))
-            {
-                path = path.Replace(@"\", "/");
-            }
+            ftpPath = ftpPath.Replace(@"\", "/");
 
             // Add [/] if missing at the beginning
-            path = (path.StartsWith("/") ? "" : "/") + path;
+            ftpPath = (ftpPath.StartsWith("/") ? "" : "/") + ftpPath;
 
-            return path;
+            return ftpPath;
         }
 
-        //private string GetFullPath(string file)
-        //{
-        //    if (file.Contains("/"))
-        //    {
-        //        return FixFtpPath(file);
-        //    }
-        //    else
-        //    {
-        //        return file;
-        //    }
-        //}
-
-        private string AddSuffix(string target, string suffix)
+        private string FixSuffix(string target, string suffix)
         {
             if (target.Substring(target.Length - 1) != suffix)
             {
