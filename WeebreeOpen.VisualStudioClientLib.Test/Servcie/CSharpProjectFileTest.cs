@@ -17,7 +17,7 @@
             CSharpProjectFileService sut = new CSharpProjectFileService();
 
             // Act
-            List<string> result = sut.FindProjectFiles(@"D:\!Data\Source\Git.Github\iwhp\weebreeopen");
+            List<string> result = sut.FindProjectFiles(@"D:\CODE\Git.Github\iwhp\weebreeopen");
 
             // Assert
             Assert.IsNotNull(result);
@@ -31,7 +31,7 @@
             CSharpProjectFileService sut = new CSharpProjectFileService();
 
             // Act
-            List<string> result = sut.FindReferences(@"D:\!Data\Source\Git.Github\iwhp\weebreeopen\WeebreeOpen.GitClientCmd\WeebreeOpen.GitClientCmd.csproj");
+            List<string> result = sut.FindReferences(@"D:\CODE\Git.Github\iwhp\weebreeopen\WeebreeOpen.GitClientCmd\WeebreeOpen.GitClientCmd.csproj");
 
             // LOG
             foreach (var item in result)
@@ -52,7 +52,7 @@
 
             // Assign
             CSharpProjectFileService sut = new CSharpProjectFileService();
-            List<string> projectFiles = sut.FindProjectFiles(@"D:\!Data\Source");
+            List<string> projectFiles = sut.FindProjectFiles(@"D:\CODE");
 
             // Act
             foreach (var projectFile in projectFiles)
@@ -111,7 +111,7 @@
 
             // Assign
             CSharpProjectFileService sut = new CSharpProjectFileService();
-            List<string> projectFiles = sut.FindProjectFiles(@"D:\!Data\Source");
+            List<string> projectFiles = sut.FindProjectFiles(@"D:\CODE");
 
             // Act
             foreach (var projectFile in projectFiles)

@@ -24,7 +24,7 @@
         {
             // Assign
             GitClientService sut = new GitClientService();
-            this.GitRepositoryPath = @"D:\!Data\Source\Git.Github";
+            this.GitRepositoryPath = @"D:\CODE\Git.Github";
 
             // Act
             List<string> result = sut.FindRepositories(this.GitRepositoryPath);
@@ -40,7 +40,7 @@
         {
             // Assign
             GitClientService sut = new GitClientService();
-            this.GitRepositoryPath = @"D:\!Data\Source\Git.Github\iwhp\weebreeopen";
+            this.GitRepositoryPath = @"D:\CODE\Git.Github\iwhp\weebreeopen";
 
             // Act
             List<string> result = sut.FindRepositories(this.GitRepositoryPath);
@@ -55,7 +55,7 @@
         {
             // Assign
             GitClientService sut = new GitClientService();
-            this.GitRepositoryPath = @"D:\!Data\Source\Git.Github\iwhp\weebreeopen\.git";
+            this.GitRepositoryPath = @"D:\CODE\Git.Github\iwhp\weebreeopen\.git";
 
             // Act
             List<string> result = sut.FindRepositories(this.GitRepositoryPath);
@@ -74,7 +74,7 @@
         {
             // Assign
             GitClientService sut = new GitClientService();
-            this.GitRepositoryPath = @"D:\!Data\Source\Git.Github\iwhp\weebreeopen";
+            this.GitRepositoryPath = @"D:\CODE\Git.Github\iwhp\weebreeopen";
 
             // Act
             RepositoryDetails result = sut.GetRepositoryDetails(this.GitRepositoryPath, isGetStatusEntries: true);
@@ -94,7 +94,7 @@
         {
             // Assign
             GitClientService sut = new GitClientService();
-            this.GitRepositoryPath = @"D:\!Data\Source\Git.Github";
+            this.GitRepositoryPath = @"D:\CODE\Git.Github";
             List<string> gitRepositories = sut.FindRepositories(this.GitRepositoryPath);
 
             // Act
@@ -123,7 +123,7 @@
         {
             // Assign
             GitClientService sut = new GitClientService();
-            this.GitRepositoryPath = @"D:\!Data\Source\Git.Github\iwhp\weebreeopen";
+            this.GitRepositoryPath = @"D:\CODE\Git.Github\iwhp\weebreeopen";
 
             // Act
             List<StatusEntry> result = sut.GetStatus(this.GitRepositoryPath);
@@ -143,7 +143,7 @@
         {
             // Assign
             GitClientService sut = new GitClientService();
-            this.GitRepositoryPath = @"D:\!Data\Source\Git.Github";
+            this.GitRepositoryPath = @"D:\CODE\Git.Github";
             List<string> gitRepositories = sut.FindRepositories(this.GitRepositoryPath);
 
             // Act
@@ -168,7 +168,7 @@
         {
             // Assign
             GitClientService sut = new GitClientService();
-            this.GitRepositoryPath = @"D:\!Data\Source\Git.Github\iwhp\weebreeopen";
+            this.GitRepositoryPath = @"D:\CODE\Git.Github\iwhp\weebreeopen";
 
             // Act
             bool result = sut.IsDirectoryRootDirectory(this.GitRepositoryPath);
@@ -182,7 +182,7 @@
         {
             // Assign
             GitClientService sut = new GitClientService();
-            this.GitRepositoryPath = @"D:\!Data\Source\Git.Github\iwhp";
+            this.GitRepositoryPath = @"D:\CODE\Git.Github\iwhp";
 
             // Act
             bool result = sut.IsDirectoryRootDirectory(this.GitRepositoryPath);

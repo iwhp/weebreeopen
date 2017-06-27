@@ -2,7 +2,7 @@
 DEPLOYMENT (NUGET PACKAGE)
 ------------------------------------------------------------------------------------------------------------
 > DEPLOY FROM
-    D:\!Data\Source\Git.Github\iwhp\weebreeopen\WeebreeOpen.GitClientLib\!!Out-NuGet
+    D:\CODE\Git.Github\iwhp\weebreeopen\WeebreeOpen.GitClientLib\!!Out-NuGet
   TO:
     https://www.nuget.org/packages/WeebreeOpen.GitClientLib
 ============================================================================================================
