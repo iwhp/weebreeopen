@@ -62,10 +62,10 @@ namespace WeebreeOpen.FtpClientLib.Test
             //TestBase.FtpClientConnection = new FtpClientConnection("xxx.ardimedia.xxx", "xxx", "xxx");
             TestBase.FtpClientService = new FtpClientService(TestBase.FtpClientConnection);
 
-            TestBase.SetupFileSystemDeleteAll();
-            TestBase.SetupFtpDeleteAll();
-            TestBase.SetupFileSystemCreateRoot();
-            TestBase.SetupFtpCreateRoot();
+            TestBase.FileSystemDeleteAll();
+            TestBase.FtpDeleteAll();
+            TestBase.FileSystemCreateRoot();
+            TestBase.FtpCreateRoot();
         }
 
         public static void CreateTestEnvironment()
@@ -111,8 +111,8 @@ namespace WeebreeOpen.FtpClientLib.Test
         {
             if (this.IsDeleteFileSystemAndFtpAfterTestRun)
             {
-                TestBase.SetupFileSystemDeleteAll();
-                TestBase.SetupFtpDeleteAll();
+                TestBase.FileSystemDeleteAll();
+                TestBase.FtpDeleteAll();
             }
         }
 
@@ -139,52 +139,24 @@ namespace WeebreeOpen.FtpClientLib.Test
 
         #region Static Methods
 
-        #region Delete
-
-        public static void SetupFileSystemDeleteAll()
-        {
-            // Delete file system all
-            if (Directory.Exists(TestBase.FileSystemRootPath))
-            {
-                Directory.Delete(TestBase.FileSystemRootPath, true);
-            }
-
-            // Delete FTP all
-            TestBase.FtpClientService.DeleteDirectoryRecursive(TestBase.FtpRootPath);
-        }
-
-        public static void SetupFtpDeleteAll()
-        {
-            // Delete file system all
-            if (Directory.Exists(TestBase.FileSystemRootPath))
-            {
-                Directory.Delete(TestBase.FileSystemRootPath, true);
-            }
-
-            // Delete FTP all
-            TestBase.FtpClientService.DeleteDirectoryRecursive(TestBase.FtpRootPath);
-        }
-
-        #endregion
-
         #region Create
 
-        public static void SetupFileSystemCreateRoot()
+        public static void FileSystemCreateRoot()
         {
             Directory.CreateDirectory(TestBase.FileSystemRootPath);
         }
 
-        public static void SetupFtpCreateRoot()
+        public static void FtpCreateRoot()
         {
             TestBase.FtpClientService.CreateDirectory(TestBase.FtpRootPath);
         }
 
-        public static void SetupFtpCreateDirectory1()
+        public static void FtpCreateDirectory1()
         {
             TestBase.FtpClientService.CreateDirectory(TestBase.FtpDirectoryPath1);
         }
 
-        public static void SetupFtpCreateDirectory2()
+        public static void FtpCreateDirectory2()
         {
             TestBase.FtpClientService.CreateDirectory(TestBase.FtpDirectoryPath2);
         }
@@ -195,41 +167,103 @@ namespace WeebreeOpen.FtpClientLib.Test
 
         #region File System
 
-        public static void SetupFileSystemCopyFileText1()
+        public static void FileSystemCopyFileText1()
         {
             File.Copy(TestBase.TestDataPathText1, TestBase.FileSystemPathText1);
         }
 
-        public static void SetupFileSystemCopyFileBinary1()
+        public static void FileSystemCopyFileBinary1()
         {
             File.Copy(TestBase.TestDataPathBinary1, TestBase.FileSystemPathBinary1);
         }
 
         #endregion
 
-        #region FTP
+        #region FTP Copy
 
-        public static void SetupFtpCopyFileText1()
+        public static void FtpCopyFileText1()
         {
             TestBase.FtpClientService.UploadFile(TestBase.TestDataPathText1, TestBase.FtpFilePathText1, isOverrideExisting: true);
         }
 
-        public static void SetupFtpCopyFileText2()
+        public static void FtpCopyFileText2()
         {
             TestBase.FtpClientService.UploadFile(TestBase.TestDataPathText1, TestBase.FtpFilePathText2, isOverrideExisting: true);
         }
 
-        public static void SetupFtpCopyFileBinary1()
+        public static void FtpCopyFileBinary1()
         {
             TestBase.FtpClientService.UploadFile(TestBase.TestDataPathBinary1, TestBase.FtpFilePathBinary1, isOverrideExisting: true);
         }
 
-        public static void SetupFtpCopyFileBinary2()
+        public static void FtpCopyFileBinary2()
         {
             TestBase.FtpClientService.UploadFile(TestBase.TestDataPathBinary1, TestBase.FtpFilePathBinary2, isOverrideExisting: true);
         }
 
         #endregion
+
+        #region FTP Exits
+
+        public static bool FtpExistsFileText1()
+        {
+            return TestBase.FtpClientService.FtpFileExists(TestBase.FtpFilePathText1);
+        }
+
+        public static bool FtpExistsFileText2()
+        {
+            return TestBase.FtpClientService.FtpFileExists(TestBase.FtpFilePathText2);
+        }
+
+        public static bool FtpExistsFileBinary1()
+        {
+            return TestBase.FtpClientService.FtpFileExists(TestBase.FtpFilePathBinary1);
+        }
+
+        public static bool FtpExistsFileBinary2()
+        {
+            return TestBase.FtpClientService.FtpFileExists(TestBase.FtpFilePathBinary2);
+        }
+
+        public static bool FtpExistsDirectoryPath1()
+        {
+            return TestBase.FtpClientService.DirectoryExists(TestBase.FtpDirectoryPath1);
+        }
+
+        public static bool FtpExistsDirectoryPath2()
+        {
+            return TestBase.FtpClientService.DirectoryExists(TestBase.FtpDirectoryPath2);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Delete
+
+        public static void FileSystemDeleteAll()
+        {
+            // Delete file system all
+            if (Directory.Exists(TestBase.FileSystemRootPath))
+            {
+                Directory.Delete(TestBase.FileSystemRootPath, true);
+            }
+
+            // Delete FTP all
+            TestBase.FtpClientService.DeleteDirectoryRecursive(TestBase.FtpRootPath);
+        }
+
+        public static void FtpDeleteAll()
+        {
+            // Delete file system all
+            if (Directory.Exists(TestBase.FileSystemRootPath))
+            {
+                Directory.Delete(TestBase.FileSystemRootPath, true);
+            }
+
+            // Delete FTP all
+            TestBase.FtpClientService.DeleteDirectoryRecursive(TestBase.FtpRootPath);
+        }
 
         #endregion
 

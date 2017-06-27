@@ -10,14 +10,14 @@ namespace WeebreeOpen.FtpClientLib.Model
     {
         public override string ToString()
         {
-            return "FtpEntry: " + this.FtpEntryType + " " + this.DirectoryPath + " " + this.Name + " " + this.DateTime + " " + this.Size;
+            return "FtpEntry: " + this.FtpEntryType + " " + this.FileOrDirectoryPath + " " + this.Name + " " + this.DateTime + " " + this.Size;
         }
 
         public FtpEntryType FtpEntryType { get; set; }
 
         public string Name { get; set; }
 
-        public string DirectoryPath { get; set; }
+        public string FileOrDirectoryPath { get; set; }
 
 
         public DateTime DateTime { get; set; }

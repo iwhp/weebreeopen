@@ -17,12 +17,12 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_GetDirectoryListing()
         {
             // Assign
-            TestBase.SetupFtpCreateDirectory1();
-            TestBase.SetupFtpCreateDirectory2();
-            TestBase.SetupFtpCopyFileText1();
-            TestBase.SetupFtpCopyFileText2();
-            TestBase.SetupFtpCopyFileBinary1();
-            TestBase.SetupFtpCopyFileBinary2();
+            TestBase.FtpCreateDirectory1();
+            TestBase.FtpCreateDirectory2();
+            TestBase.FtpCopyFileText1();
+            TestBase.FtpCopyFileText2();
+            TestBase.FtpCopyFileBinary1();
+            TestBase.FtpCopyFileBinary2();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
@@ -49,12 +49,12 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_GetDirectoryListingRecursive()
         {
             // Assign
-            TestBase.SetupFtpCreateDirectory1();
-            TestBase.SetupFtpCreateDirectory2();
-            TestBase.SetupFtpCopyFileText1();
-            TestBase.SetupFtpCopyFileText2();
-            TestBase.SetupFtpCopyFileBinary1();
-            TestBase.SetupFtpCopyFileBinary2();
+            TestBase.FtpCreateDirectory1();
+            TestBase.FtpCreateDirectory2();
+            TestBase.FtpCopyFileText1();
+            TestBase.FtpCopyFileText2();
+            TestBase.FtpCopyFileBinary1();
+            TestBase.FtpCopyFileBinary2();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
@@ -81,7 +81,7 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileDownload_TextFile()
         {
             // Assign
-            TestBase.SetupFtpCopyFileText1();
+            TestBase.FtpCopyFileText1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
             Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathText1));
 
@@ -100,7 +100,7 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileDownload_BinaryFile()
         {
             // Assign
-            TestBase.SetupFtpCopyFileBinary1();
+            TestBase.FtpCopyFileBinary1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
             Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathBinary1));
 
@@ -117,26 +117,82 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
 
         #endregion
 
+        #region DownloadFilesInDirectory
+
+        [TestMethod]
+        public void FtpClientService_DownloadFilesInDirectory()
+        {
+            // Assign
+            TestBase.FtpCreateDirectory1();
+            TestBase.FtpCreateDirectory2();
+            TestBase.FtpCopyFileText1();
+            TestBase.FtpCopyFileText2();
+            TestBase.FtpCopyFileBinary1();
+            TestBase.FtpCopyFileBinary2();
+
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathText1));
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathBinary1));
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathText2));
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathBinary2));
+            Assert.IsTrue(TestBase.FtpExistsFileBinary1());
+            Assert.IsTrue(TestBase.FtpExistsFileBinary2());
+            Assert.IsTrue(TestBase.FtpExistsFileText1());
+            Assert.IsTrue(TestBase.FtpExistsFileText2());
+            Assert.IsTrue(TestBase.FtpExistsDirectoryPath1());
+            Assert.IsTrue(TestBase.FtpExistsDirectoryPath2());
+
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+
+            // Act
+            bool result = sut.DownloadFilesInDirectory(TestBase.FtpRootPath, TestBase.FileSystemRootPath, true, true);
+
+            // Log
+            this.LogEventMessages(sut);
+
+            // Assert
+            Assert.AreEqual<bool>(true, result);
+            Assert.AreEqual<bool>(true, File.Exists(TestBase.FileSystemPathText1));
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathText2));
+            Assert.AreEqual<bool>(true, File.Exists(TestBase.FileSystemPathBinary1));
+            Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathBinary2));
+            Assert.IsFalse(TestBase.FtpExistsFileBinary1());
+            Assert.IsTrue(TestBase.FtpExistsFileBinary2());
+            Assert.IsFalse(TestBase.FtpExistsFileText1());
+            Assert.IsTrue(TestBase.FtpExistsFileText2());
+            Assert.IsTrue(TestBase.FtpExistsDirectoryPath1());
+            Assert.IsTrue(TestBase.FtpExistsDirectoryPath2());
+        }
+
+        #endregion
+
         #region FileDownloadRecursive
 
         [TestMethod]
         public void FtpClientService_FileDownloadRecursive()
         {
             // Assign
-            TestBase.SetupFtpCreateDirectory1();
-            TestBase.SetupFtpCreateDirectory2();
-            TestBase.SetupFtpCopyFileText1();
-            TestBase.SetupFtpCopyFileText2();
-            TestBase.SetupFtpCopyFileBinary1();
-            TestBase.SetupFtpCopyFileBinary2();
-            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
+            TestBase.FtpCreateDirectory1();
+            TestBase.FtpCreateDirectory2();
+            TestBase.FtpCopyFileText1();
+            TestBase.FtpCopyFileText2();
+            TestBase.FtpCopyFileBinary1();
+            TestBase.FtpCopyFileBinary2();
+
             Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathText1));
             Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathBinary1));
             Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathText2));
             Assert.AreEqual<bool>(false, File.Exists(TestBase.FileSystemPathBinary2));
+            Assert.IsTrue(TestBase.FtpExistsFileBinary1());
+            Assert.IsTrue(TestBase.FtpExistsFileBinary2());
+            Assert.IsTrue(TestBase.FtpExistsFileText1());
+            Assert.IsTrue(TestBase.FtpExistsFileText2());
+            Assert.IsTrue(TestBase.FtpExistsDirectoryPath1());
+            Assert.IsTrue(TestBase.FtpExistsDirectoryPath2());
+
+            FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
-            bool result = sut.DownloadFileRecursive(TestBase.FtpRootPath, TestBase.FileSystemRootPath, true, false);
+            bool result = sut.DownloadFilesRecursive(TestBase.FtpRootPath, TestBase.FileSystemRootPath, true, true, true);
 
             // Log
             this.LogEventMessages(sut);
@@ -147,6 +203,12 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
             Assert.AreEqual<bool>(true, File.Exists(TestBase.FileSystemPathText2));
             Assert.AreEqual<bool>(true, File.Exists(TestBase.FileSystemPathBinary1));
             Assert.AreEqual<bool>(true, File.Exists(TestBase.FileSystemPathBinary2));
+            Assert.IsFalse(TestBase.FtpExistsFileBinary1());
+            Assert.IsFalse(TestBase.FtpExistsFileBinary2());
+            Assert.IsFalse(TestBase.FtpExistsFileText1());
+            Assert.IsFalse(TestBase.FtpExistsFileText2());
+            Assert.IsFalse(TestBase.FtpExistsDirectoryPath1());
+            Assert.IsFalse(TestBase.FtpExistsDirectoryPath2());
         }
 
         #endregion
@@ -157,7 +219,7 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileUpload_FileText1_DoNotDelete()
         {
             // Assign
-            TestBase.SetupFileSystemCopyFileText1();
+            TestBase.FileSystemCopyFileText1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
             Assert.IsTrue(File.Exists(TestBase.FileSystemPathText1));
 
@@ -177,7 +239,7 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileUpload_FileText1_Delete()
         {
             // Assign
-            TestBase.SetupFileSystemCopyFileText1();
+            TestBase.FileSystemCopyFileText1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
             Assert.IsTrue(File.Exists(TestBase.FileSystemPathText1));
 
@@ -197,7 +259,7 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileUpload_FileText1_AlreadyExists()
         {
             // Assign
-            TestBase.SetupFtpCopyFileText1();
+            TestBase.FtpCopyFileText1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
@@ -221,7 +283,7 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileUpload_FileText1_AlreadyExists_Override()
         {
             // Assign
-            TestBase.SetupFtpCopyFileText1();
+            TestBase.FtpCopyFileText1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
@@ -280,7 +342,7 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_FileDelete()
         {
             // Assign
-            TestBase.SetupFtpCopyFileText1();
+            TestBase.FtpCopyFileText1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
@@ -351,7 +413,7 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_Directory_Create_Sub()
         {
             // Assign
-            TestBase.SetupFtpCreateDirectory1();
+            TestBase.FtpCreateDirectory1();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act
@@ -390,12 +452,12 @@ namespace WeebreeOpen.FtpClientLib.Test.Service
         public void FtpClientService_DeleteDirectoryWithFile()
         {
             // Assign
-            TestBase.SetupFtpCreateDirectory1();
-            TestBase.SetupFtpCreateDirectory2();
-            TestBase.SetupFtpCopyFileText1();
-            TestBase.SetupFtpCopyFileText2();
-            TestBase.SetupFtpCopyFileBinary1();
-            TestBase.SetupFtpCopyFileBinary2();
+            TestBase.FtpCreateDirectory1();
+            TestBase.FtpCreateDirectory2();
+            TestBase.FtpCopyFileText1();
+            TestBase.FtpCopyFileText2();
+            TestBase.FtpCopyFileBinary1();
+            TestBase.FtpCopyFileBinary2();
             FtpClientService sut = new FtpClientService(TestBase.FtpClientConnection);
 
             // Act

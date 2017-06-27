@@ -143,7 +143,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             }
             catch (Exception ex)
             {
-                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not create directory: [{0}].", directoryPath), ex));
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error($"Could not create directory [{directoryPath}].", ex));
                 return false;
             }
             return true;
@@ -165,7 +165,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             }
             catch (Exception ex)
             {
-                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not delete directory: [{0}].", directoryPath), ex));
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error($"Could not delete directory [{directoryPath}].", ex));
                 return false;
             }
             return true;
@@ -176,16 +176,16 @@ namespace WeebreeOpen.FtpClientLib.Service
             // Delete all entries within the directory
             List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(directoryPath);
 
-            foreach (FtpEntry ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
+            foreach (FtpEntry ftpEntry in ftpEntries.OrderByDescending(x => x.FileOrDirectoryPath).ToList())
             {
                 if (ftpEntry.FtpEntryType == FtpEntryType.File)
                 {
-                    bool isFileDeleteOK = DeleteFile(ftpEntry.DirectoryPath);
+                    bool isFileDeleteOK = DeleteFile(ftpEntry.FileOrDirectoryPath);
                     if (!isFileDeleteOK) { return false; }
                 }
                 else
                 {
-                    bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.DirectoryPath);
+                    bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.FileOrDirectoryPath);
                     if (!isDirectoryDeleteOK) { return false; }
                 }
             }
@@ -209,7 +209,7 @@ namespace WeebreeOpen.FtpClientLib.Service
 
             foreach (FtpEntry rootItem in allEntries.Where(x => x.FtpEntryType == FtpEntryType.Directory).ToList())
             {
-                allEntries.AddRange(GetDirectoryListingRecursive(rootItem.DirectoryPath));
+                allEntries.AddRange(GetDirectoryListingRecursive(rootItem.FileOrDirectoryPath));
             }
 
             return allEntries;
@@ -301,11 +301,11 @@ namespace WeebreeOpen.FtpClientLib.Service
                     {
                         dateTime = DateTime.Parse(split.Groups["timestamp"].Value, new CultureInfo("en-US"));
                     }
-                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Information("Date from Ftp Server: " + dateTimeString + " converted to: " + dateTime));
+                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Information($"Date from Ftp Server [{dateTimeString}] converted to [{dateTime}]"));
                 }
                 catch (Exception ex)
                 {
-                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not parse date: [{0}].", dateTimeString), ex));
+                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error($"Could not parse date [{dateTimeString}].", ex));
                     dateTime = Convert.ToDateTime(null);
                 }
 
@@ -336,7 +336,7 @@ namespace WeebreeOpen.FtpClientLib.Service
                     Size = int.TryParse(size, out x) ? x : 0,
                     DateTime = dateTime,
                     FtpEntryType = ftpEntryType,
-                    DirectoryPath = directoryPath
+                    FileOrDirectoryPath = directoryPath
                     //Month = month,
                     //Day = day,
                     //YearTime = timeYear
@@ -350,50 +350,36 @@ namespace WeebreeOpen.FtpClientLib.Service
 
         public bool DownloadFile(string filePathSource, string filePathTarget, bool isOverrideExisting, DateTime? setDateTimeForFile = null)
         {
-            FileInfo fi = new FileInfo(filePathTarget);
-            return this.DownloadFile(filePathSource, fi, isOverrideExisting, setDateTimeForFile);
+            FileInfo fileInfo = new FileInfo(filePathTarget);
+            return this.DownloadFile(filePathSource, fileInfo, isOverrideExisting, setDateTimeForFile);
         }
 
-        public bool DownloadFileRecursive(string startingPathSource, string startingPathTarget, bool isOverrideExisting = false, bool isDeleteSourceAfterDownload = false, bool isDeleteChildDirectories = false)
+        /// <summary>
+        /// Copy all files within the specified directory.
+        /// </summary>
+        public bool DownloadFilesInDirectory(string startingPathSource, string startingPathTarget, bool isOverrideExisting = false, bool isDeleteSourceAfterDownload = false)
         {
-            List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(startingPathSource);
+            startingPathSource = this.FixDirectorySuffixFtp(startingPathSource);
+            startingPathTarget = this.FixDirectorySuffixFileSystem(startingPathTarget);
+
+            List<FtpEntry> ftpEntries = this.GetDirectoryListing(startingPathSource);
 
             Directory.CreateDirectory(startingPathTarget);
 
-            // Copy all Files
-            foreach (FtpEntry ftpEntry in ftpEntries.OrderByDescending(x => x.DirectoryPath).ToList())
+            // Copy all files within the directory
+            foreach (FtpEntry ftpEntry in ftpEntries.OrderByDescending(x => x.FileOrDirectoryPath).ToList())
             {
-                // Build target path
-                string x1 = ftpEntry.DirectoryPath;
-                if (!string.IsNullOrWhiteSpace(startingPathSource))
+                if (ftpEntry.FtpEntryType == FtpEntryType.Directory)
                 {
-                    x1 = ftpEntry.DirectoryPath.Replace(startingPathSource, "");
+                    // Do not processes directories since we only download files from the current directory
+                    continue;
                 }
 
-                string targetFilePath = startingPathTarget + x1.Replace("/", @"\");
-
-                string targetPath;
-                if (ftpEntry.FtpEntryType == FtpEntryType.File)
-                {
-                    targetPath = Path.GetDirectoryName(targetFilePath);
-                }
-                else
-                {
-                    targetPath = targetFilePath;
-                }
-
-                if (FixSuffix(startingPathTarget, @"\") != FixSuffix(targetPath, @"\"))
-                {
-                    DirectoryInfo directoryCreated = Directory.CreateDirectory(targetPath);
-                    directoryCreated.CreationTime = ftpEntry.DateTime;
-                    directoryCreated.LastWriteTime = ftpEntry.DateTime;
-                }
+                // Set file path to copy the file to
+                string targetFilePath = startingPathTarget + ftpEntry.Name;
 
                 bool isFileDownloadOK = true;
-                if (ftpEntry.FtpEntryType == FtpEntryType.File)
-                {
-                    isFileDownloadOK = DownloadFile(ftpEntry.DirectoryPath, targetFilePath, isOverrideExisting, ftpEntry.DateTime);
-                }
+                isFileDownloadOK = DownloadFile(ftpEntry.FileOrDirectoryPath, targetFilePath, isOverrideExisting, ftpEntry.DateTime);
 
                 if (isFileDownloadOK)
                 {
@@ -401,31 +387,107 @@ namespace WeebreeOpen.FtpClientLib.Service
                     {
                         if (ftpEntry.FtpEntryType == FtpEntryType.File)
                         {
-                            bool isFileDeleteOK = DeleteFile(ftpEntry.DirectoryPath);
+                            bool isFileDeleteOK = DeleteFile(ftpEntry.FileOrDirectoryPath);
                             if (!isFileDeleteOK)
                             {
-                                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("During coping file could not delete file: [{0}].", ftpEntry.DirectoryPath)));
+                                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error($"During coping file could not delete file [{ftpEntry.FileOrDirectoryPath}]."));
                                 return false;
-                            }
-                        }
-                        else
-                        {
-                            if (isDeleteChildDirectories)
-                            {
-                                // Delete Directory (if not empty, it will not be deleted (return code = false))
-                                bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.DirectoryPath);
-                                if (!isDirectoryDeleteOK)
-                                {
-                                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("During coping file could not delete directory (direcctory no empty?): [{0}].", ftpEntry.DirectoryPath)));
-                                    return false;
-                                }
                             }
                         }
                     }
                 }
                 else
                 {
+                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error($"Coping file could not performed [{ftpEntry.Name}]."));
                     return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Copy all files in all directories starting from the provided starting path.
+        /// </summary>
+        public bool DownloadFilesRecursive(string startingPathSource, string startingPathTarget, bool isOverrideExisting = false, bool isDeleteSourceAfterDownload = false, bool isDeleteChildDirectories = false)
+        {
+            startingPathSource = this.FixDirectorySuffixFtp(startingPathSource);
+            startingPathTarget = this.FixDirectorySuffixFileSystem(startingPathTarget);
+
+            List<FtpEntry> ftpEntries = GetDirectoryListingRecursive(startingPathSource);
+
+            Directory.CreateDirectory(startingPathTarget);
+
+            // Copy all Files
+            foreach (FtpEntry ftpEntry in ftpEntries.OrderByDescending(x => x.FileOrDirectoryPath).ToList())
+            {
+                #region Build target file path
+
+                string rootlessFilePath = ftpEntry.FileOrDirectoryPath;
+                if (!string.IsNullOrWhiteSpace(startingPathSource))
+                {
+                    rootlessFilePath = ftpEntry.FileOrDirectoryPath.Replace(startingPathSource, "");
+                }
+
+                string targetFilePath = startingPathTarget + rootlessFilePath.Replace("/", @"\");
+
+                #endregion
+
+                #region Create file system directory recursive (if necessary)
+
+                string targetDirectoryPath;
+                if (ftpEntry.FtpEntryType == FtpEntryType.File)
+                {
+                    targetDirectoryPath = this.FixDirectorySuffixFileSystem(Path.GetDirectoryName(targetFilePath));
+                }
+                else
+                {
+                    targetDirectoryPath = this.FixDirectorySuffixFileSystem(targetFilePath);
+                }
+
+                // Create Directory
+                if (!Directory.Exists(targetDirectoryPath))
+                {
+                    DirectoryInfo directoryCreated = Directory.CreateDirectory(targetDirectoryPath);
+                    directoryCreated.CreationTime = ftpEntry.DateTime;
+                    directoryCreated.LastWriteTime = ftpEntry.DateTime;
+                }
+
+                #endregion
+
+                if (ftpEntry.FtpEntryType == FtpEntryType.File)
+                {
+                    bool isFileDownloadOK = DownloadFile(ftpEntry.FileOrDirectoryPath, targetFilePath, isOverrideExisting, ftpEntry.DateTime);
+                    if (isFileDownloadOK)
+                    {
+                        if (isDeleteSourceAfterDownload)
+                        {
+                            bool isFileDeleteOK = this.DeleteFile(ftpEntry.FileOrDirectoryPath);
+                            if (!isFileDeleteOK)
+                            {
+                                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error($"File could not be deleted [{ftpEntry.FileOrDirectoryPath}]."));
+                                return false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error($"File could not be downloaded [{ftpEntry.FileOrDirectoryPath}]."));
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (isDeleteChildDirectories)
+                    {
+                        // Delete Directory (if not empty, it will not be deleted
+                        bool isDirectoryDeleteOK = DeleteDirectory(ftpEntry.FileOrDirectoryPath);
+                        if (!isDirectoryDeleteOK)
+                        {
+                            OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error($"Directory could not be delete [{ftpEntry.FileOrDirectoryPath}]."));
+                            return false;
+                        }
+                    }
                 }
             }
 
@@ -489,7 +551,7 @@ namespace WeebreeOpen.FtpClientLib.Service
                         }
                         catch (Exception ex)
                         {
-                            OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not download file: [{0}] to file [{1}].", filePathSource, fileInfoTarget), ex));
+                            OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error($"Could not download file: [{filePathSource}] to file [{fileInfoTarget}].", ex));
                             // Catch error and delete file only partially downloaded
                             fs.Close();
                             // Delete target file as it's incomplete
@@ -635,7 +697,7 @@ namespace WeebreeOpen.FtpClientLib.Service
                 }
                 catch (Exception ex)
                 {
-                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not upload file: [{0}] to file [{1}].", fileInfoSource.FullName, filePathTarget), ex));
+                    OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error($"Could not upload file: [{fileInfoSource.FullName}] to file [{filePathTarget}].", ex));
                     return false;
                 }
                 finally
@@ -676,7 +738,7 @@ namespace WeebreeOpen.FtpClientLib.Service
             }
             catch (Exception ex)
             {
-                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error(string.Format("Could not delete file: [{0}].", filePath), ex));
+                OnRaiseFtpServiceEvent(FtpServiceEventArgs.Error($"Could not delete file [{filePath}].", ex));
                 return false;
             }
 
@@ -855,12 +917,22 @@ namespace WeebreeOpen.FtpClientLib.Service
             return ftpPath;
         }
 
+        private string FixDirectorySuffixFtp(string target)
+        {
+            return this.FixSuffix(target, @"/");
+        }
+
+        private string FixDirectorySuffixFileSystem(string target)
+        {
+            return this.FixSuffix(target, @"\");
+        }
+
         private string FixSuffix(string target, string suffix)
         {
-            if (target.Substring(target.Length - 1) != suffix)
-            {
-                target += suffix;
-            }
+            target = target.EndsWith(@"\") ? target.Substring(0, target.Length - 1) : target;
+            target = target.EndsWith(@"/") ? target.Substring(0, target.Length - 1) : target;
+            target = target.EndsWith(suffix) ? target.Substring(0, target.Length - suffix.Length) : target;
+            target += suffix;
 
             return target;
         }
