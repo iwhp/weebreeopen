@@ -138,7 +138,7 @@
 
             List<StatusEntry> statusEntries = new List<StatusEntry>();
 
-            using (var repository = new LibGit2Sharp.Repository(gitRootDirectory))
+            using (IRepository repository = new LibGit2Sharp.Repository(gitRootDirectory))
             {
                 foreach (LibGit2Sharp.StatusEntry item in repository.Index.RetrieveStatus())
                 {

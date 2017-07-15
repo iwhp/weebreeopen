@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>WeebreeOpen.SystemLib</id>
+    <version>0.0.3-beta</version>
+    <authors>Weebree</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>System Library based on C#.</description>
+    <releaseNotes>Early preview.</releaseNotes>
+  </metadata>
+  <files>
+    <file src="bin\Release\WeebreeOpen.SystemLib.dll" target="lib\WeebreeOpen.SystemLib.dll" />
+  </files>
+</package>

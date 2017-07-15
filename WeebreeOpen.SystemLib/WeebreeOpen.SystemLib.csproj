@@ -59,11 +59,11 @@
     <Compile Include="Scheduler\Model\TriggerFrequency.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="nuspec-packager.nuspec" />
+    <None Include="package.nuspec" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="!Readme.txt" />
-    <Content Include="FileWatcher\!Readme.txt" />
+    <Content Include="README.txt" />
+    <Content Include="FileWatcher\README.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
