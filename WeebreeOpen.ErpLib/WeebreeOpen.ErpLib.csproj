@@ -1,144 +1,53 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B04990DC-0469-4F00-84BB-F81CC90580CA}</ProjectGuid>
+    <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WeebreeOpen.ErpLib</RootNamespace>
-    <AssemblyName>WeebreeOpen.ErpLib</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Application\Service\CustomerService.cs" />
-    <Compile Include="Domain\Model\Base\StreetAddress.cs" />
-    <Compile Include="Domain\Model\Base\Tax.cs" />
-    <Compile Include="Domain\Model\Base\UnitOfMeasure.cs" />
-    <Compile Include="Domain\Model\Base\CurrencyExchangeRate.cs" />
-    <Compile Include="Domain\Model\Base\Currency.cs" />
-    <Compile Include="Domain\Model\Base\Language.cs" />
-    <Compile Include="Domain\Model\Base\Translation.cs" />
-    <Compile Include="Domain\Model\Base\TaxRate.cs" />
-    <Compile Include="Domain\Model\Tenant\BusinessTransaction\TransactionLine.cs" />
-    <Compile Include="Domain\Model\Tenant\BusinessTransaction\Transaction.cs" />
-    <Compile Include="Domain\Model\Tenant\BusinessTransaction\ShippingLine.cs" />
-    <Compile Include="Domain\Model\Tenant\BusinessTransaction\Shipping.cs" />
-    <Compile Include="Domain\Model\Tenant\BusinessTransaction\OrderLine.cs" />
-    <Compile Include="Domain\Model\Tenant\BusinessTransaction\Order.cs" />
-    <Compile Include="Domain\Model\Tenant\Product\ItemPrice.cs" />
-    <Compile Include="Domain\Model\Tenant\Product\ItemPricePurchase.cs" />
-    <Compile Include="Domain\Model\Tenant\Product\ItemPriceSale.cs" />
-    <Compile Include="Domain\Model\Tenant\Product\Item.cs" />
-    <Compile Include="Domain\Specification\BusinessPartySpecs\RuleIsOrganisationOrIsPerson.cs" />
-    <Compile Include="Domain\Specification\BusinessPartySpecs\RuleIsOrganisationTrue.cs" />
-    <Compile Include="Domain\Specification\BusinessPartySpecs\RuleIsPersonTrue.cs" />
-    <Compile Include="Domain\Specification\LocationSpecs\RuleNameNotEmpty.cs" />
-    <Compile Include="Domain\Validation\LocationValidator.cs" />
-    <Compile Include="ErpLibResource.Designer.cs">
+    <PackageReference Include="EntityFramework" Version="6.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ErpLibResource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ErpLibResource.resx</DependentUpon>
     </Compile>
-    <Compile Include="Practices\BaseEntity.cs" />
-    <Compile Include="Domain\Model\Base\Tenant.cs" />
-    <Compile Include="Practices\BaseEntityTenant.cs" />
-    <Compile Include="Domain\Model\Base\RecordLog.cs" />
-    <Compile Include="Domain\Model\Base\RecordLogAction.cs" />
-    <Compile Include="Domain\Model\Base\City.cs" />
-    <Compile Include="Domain\Model\Base\Country.cs" />
-    <Compile Include="Domain\Model\Base\Region.cs" />
-    <Compile Include="Domain\Model\Tenant\Party\BusinessPartyVendor.cs" />
-    <Compile Include="Domain\Model\Tenant\Party\BusinessPartyEmployee.cs" />
-    <Compile Include="Domain\Model\Tenant\Party\LocationBusinessParty.cs" />
-    <Compile Include="Domain\Model\Tenant\Party\Location.cs" />
-    <Compile Include="Domain\Model\Tenant\Party\BusinessParty.cs" />
-    <Compile Include="Domain\Model\Tenant\Party\BusinessPartyCustomer.cs" />
-    <Compile Include="Domain\Model\Tenant\Wine\WineStore.cs" />
-    <Compile Include="Domain\Model\Tenant\Wine\Wine.cs" />
-    <Compile Include="Infractructure\MsSql\ErpDbContext.cs" />
-    <Compile Include="Practices\BaseRepository.cs" />
-    <Compile Include="Practices\BaseUnitOfWork.cs" />
-    <Compile Include="Practices\BaseDbContext.cs" />
-    <Compile Include="Practices\Specification.cs" />
-    <Compile Include="Practices\SpecificationRule.cs" />
-    <Compile Include="Domain\Specification\BusinessPartySpecs\ByAssignedUser.cs" />
-    <Compile Include="Domain\Specification\BusinessPartySpecs\ConsistencyCompanyId.cs" />
-    <Compile Include="Domain\Specification\BusinessPartySpecs\DependencyCompany.cs" />
-    <Compile Include="Domain\Specification\BusinessPartySpecs\RuleNameNotEmpty.cs" />
-    <Compile Include="Domain\Validation\BusinessPartyCustomerValidator.cs" />
-    <Compile Include="Practices\Validator.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Update="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
+
   <ItemGroup>
     <Folder Include="Domain\ModelView\" />
   </ItemGroup>
+
   <ItemGroup>
     <Content Include="README.txt" />
     <Content Include="Practices\README.txt" />
     <Content Include="Domain\Model\Tenant\Wine\README.txt" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="ErpLibResource.resx">
+    <EmbeddedResource Update="ErpLibResource.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>ErpLibResource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

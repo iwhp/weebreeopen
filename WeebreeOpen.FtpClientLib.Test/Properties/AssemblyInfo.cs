@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("WeebreeOpen.FtpClientLib.Tests")]
+//[assembly: AssemblyTitle("WeebreeOpen.FtpClientLib.Tests")]
 [assembly: AssemblyDescription("Release Date: 2017-05-29")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Weebree - Liechtenstein")]
-[assembly: AssemblyProduct("WeebreeOpen.FtpClientLib.Tests")]
+//[assembly: AssemblyConfiguration("")]
+//[assembly: AssemblyCompany("Weebree - Liechtenstein")]
+//[assembly: AssemblyProduct("WeebreeOpen.FtpClientLib.Tests")]
 [assembly: AssemblyCopyright("Copyright © 2017 Weebree")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.0.3")]
-[assembly: AssemblyFileVersion("0.0.3")]
+//[assembly: AssemblyVersion("0.0.3")]
+//[assembly: AssemblyFileVersion("0.0.3")]
