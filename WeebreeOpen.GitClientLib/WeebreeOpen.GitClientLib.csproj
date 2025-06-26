@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net48;net9.0</TargetFrameworks>
     <OutputType>Library</OutputType>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibGit2Sharp" Version="0.20.2.0" />
-    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="1.0.164" />
+    <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
+    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.323" />
   </ItemGroup>
 
 </Project>

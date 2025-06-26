@@ -1,199 +1,197 @@
-﻿namespace WeebreeOpen.GitClientLib.Service
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using LibGit2Sharp;
+using WeebreeOpen.GitClientLib.Model;
+
+namespace WeebreeOpen.GitClientLib.Service;
+
+public class GitClientService
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using LibGit2Sharp;
-    using WeebreeOpen.GitClientLib.Model;
-
-    public class GitClientService
+    public void DeleteRepositories(string gitRootDirectory)
     {
-        public void DeleteRepositories(string gitRootDirectory)
+        #region Verify Parameters
+
+        if (string.IsNullOrWhiteSpace(gitRootDirectory))
         {
-            #region Verify Parameters
-
-            if (string.IsNullOrWhiteSpace(gitRootDirectory))
-            {
-                throw new ArgumentNullException("gitRootDirectory");
-            }
-
-            if (!Directory.Exists(gitRootDirectory))
-            {
-                throw new ArgumentException("Path does not exist.", "gitRootDirectory");
-            }
-
-            if (!IsDirectoryRootDirectory(gitRootDirectory))
-            {
-                throw new ArgumentException("Path is not a git root directory.", "gitRootDirectory");
-            }
-
-            #endregion
-
-            Directory.Delete(gitRootDirectory);
+            throw new ArgumentNullException("gitRootDirectory");
         }
 
-        public List<string> FindRepositories(string startingPath)
+        if (!Directory.Exists(gitRootDirectory))
         {
-            #region Verify Parameters
+            throw new ArgumentException("Path does not exist.", "gitRootDirectory");
+        }
 
-            if (string.IsNullOrWhiteSpace(startingPath))
-            {
-                throw new ArgumentNullException("startingPath");
-            }
+        if (!IsDirectoryRootDirectory(gitRootDirectory))
+        {
+            throw new ArgumentException("Path is not a git root directory.", "gitRootDirectory");
+        }
 
-            if (!Directory.Exists(startingPath))
-            {
-                throw new ArgumentException("Path does not exist.", "startingPath");
-            }
+        #endregion
 
-            #endregion
+        Directory.Delete(gitRootDirectory);
+    }
 
-            List<string> repositories = new List<string>();
-            if (IsDirectoryRootDirectory(startingPath))
-            {
-                repositories.Add(startingPath);
-                return repositories;
-            }
+    public List<string> FindRepositories(string startingPath)
+    {
+        #region Verify Parameters
 
-            foreach (string item in Directory.GetDirectories(startingPath))
-            {
-                repositories.AddRange(FindRepositories(item));
-            }
+        if (string.IsNullOrWhiteSpace(startingPath))
+        {
+            throw new ArgumentNullException("startingPath");
+        }
 
+        if (!Directory.Exists(startingPath))
+        {
+            throw new ArgumentException("Path does not exist.", "startingPath");
+        }
+
+        #endregion
+
+        List<string> repositories = new();
+        if (IsDirectoryRootDirectory(startingPath))
+        {
+            repositories.Add(startingPath);
             return repositories;
         }
 
-        public RepositoryDetails GetRepositoryDetails(string gitRootDirectory, bool isGetStatusEntries = false)
+        foreach (string item in Directory.GetDirectories(startingPath))
         {
-            #region Verify Parameters
-
-            if (string.IsNullOrWhiteSpace(gitRootDirectory))
-            {
-                throw new ArgumentNullException("gitRootDirectory");
-            }
-
-            if (!Directory.Exists(gitRootDirectory))
-            {
-                throw new ArgumentException("Path does not exist.", "gitRootDirectory");
-            }
-
-            if (!IsDirectoryRootDirectory(gitRootDirectory))
-            {
-                throw new ArgumentException("Path is not a git root directory.", "gitRootDirectory");
-            }
-
-            #endregion
-
-            RepositoryDetails repositoryDetails = new RepositoryDetails(gitRootDirectory);
-            if (isGetStatusEntries)
-            {
-                repositoryDetails.StatusEntries = GetStatus(repositoryDetails.RepositoryPath);
-            }
-
-            return repositoryDetails;
+            repositories.AddRange(FindRepositories(item));
         }
 
-        public List<RepositoryDetails> GetRepositoryDetails(List<string> gitRootDirectories, bool isGetStatusEntries = false)
+        return repositories;
+    }
+
+    public RepositoryDetails GetRepositoryDetails(string gitRootDirectory, bool isGetStatusEntries = false)
+    {
+        #region Verify Parameters
+
+        if (string.IsNullOrWhiteSpace(gitRootDirectory))
         {
-            #region Verify Parameters
-
-            if (gitRootDirectories == null)
-            {
-                throw new ArgumentNullException("gitRootDirectories");
-            }
-
-            #endregion
-
-            List<RepositoryDetails> repositoryDetails = new List<RepositoryDetails>();
-
-            foreach (string item in gitRootDirectories)
-            {
-                repositoryDetails.Add(GetRepositoryDetails(item, isGetStatusEntries));
-            }
-
-            return repositoryDetails;
+            throw new ArgumentNullException("gitRootDirectory");
         }
 
-        public List<StatusEntry> GetStatus(string gitRootDirectory)
+        if (!Directory.Exists(gitRootDirectory))
         {
-            #region Verify Parameters
-
-            if (string.IsNullOrWhiteSpace(gitRootDirectory))
-            {
-                throw new ArgumentNullException("gitRootDirectory");
-            }
-
-            if (!Directory.Exists(gitRootDirectory))
-            {
-                throw new ArgumentException("Path does not exist.", "gitRootDirectory");
-            }
-
-            if (!IsDirectoryRootDirectory(gitRootDirectory))
-            {
-                throw new ArgumentException("Path is not a git root directory.", "gitRootDirectory");
-            }
-
-            #endregion
-
-            List<StatusEntry> statusEntries = new List<StatusEntry>();
-
-            using (IRepository repository = new LibGit2Sharp.Repository(gitRootDirectory))
-            {
-                foreach (LibGit2Sharp.StatusEntry item in repository.Index.RetrieveStatus())
-                {
-                    statusEntries.Add(item);
-                }
-            }
-
-            return statusEntries;
+            throw new ArgumentException("Path does not exist.", "gitRootDirectory");
         }
 
-        public List<StatusEntry> GetStatus(List<string> gitRootDirectories)
+        if (!IsDirectoryRootDirectory(gitRootDirectory))
         {
-            #region Verify Parameters
-
-            if (gitRootDirectories == null)
-            {
-                throw new ArgumentNullException("gitRootDirectories");
-            }
-
-            #endregion
-
-            List<StatusEntry> statusEntries = new List<StatusEntry>();
-
-            foreach (string item in gitRootDirectories)
-            {
-                statusEntries.AddRange(GetStatus(item));
-            }
-
-            return statusEntries;
+            throw new ArgumentException("Path is not a git root directory.", "gitRootDirectory");
         }
 
-        public bool IsDirectoryRootDirectory(string diretcoryPath)
+        #endregion
+
+        RepositoryDetails repositoryDetails = new(gitRootDirectory);
+        if (isGetStatusEntries)
         {
-            #region Verify Parameters
+            repositoryDetails.StatusEntries = GetStatus(repositoryDetails.RepositoryPath);
+        }
 
-            if (string.IsNullOrWhiteSpace(diretcoryPath))
-            {
-                throw new ArgumentNullException("diretcoryPath");
-            }
+        return repositoryDetails;
+    }
 
-            if (!Directory.Exists(diretcoryPath))
-            {
-                throw new ArgumentException("Path does not exist.", "diretcoryPath");
-            }
+    public List<RepositoryDetails> GetRepositoryDetails(List<string> gitRootDirectories, bool isGetStatusEntries = false)
+    {
+        #region Verify Parameters
 
-            #endregion
+        if (gitRootDirectories == null)
+        {
+            throw new ArgumentNullException("gitRootDirectories");
+        }
 
-            if (Directory.Exists(diretcoryPath + @"\.git"))
+        #endregion
+
+        List<RepositoryDetails> repositoryDetails = new();
+
+        foreach (string item in gitRootDirectories)
+        {
+            repositoryDetails.Add(GetRepositoryDetails(item, isGetStatusEntries));
+        }
+
+        return repositoryDetails;
+    }
+
+    public List<StatusEntry> GetStatus(string gitRootDirectory)
+    {
+        #region Verify Parameters
+
+        if (string.IsNullOrWhiteSpace(gitRootDirectory))
+        {
+            throw new ArgumentNullException("gitRootDirectory");
+        }
+
+        if (!Directory.Exists(gitRootDirectory))
+        {
+            throw new ArgumentException("Path does not exist.", "gitRootDirectory");
+        }
+
+        if (!IsDirectoryRootDirectory(gitRootDirectory))
+        {
+            throw new ArgumentException("Path is not a git root directory.", "gitRootDirectory");
+        }
+
+        #endregion
+
+        List<StatusEntry> statusEntries = new();
+
+        using (IRepository repository = new LibGit2Sharp.Repository(gitRootDirectory))
+        {
+            foreach (LibGit2Sharp.StatusEntry item in repository.RetrieveStatus())
             {
-                return true;
+                statusEntries.Add(item);
             }
-            else
-            {
-                return false;
-            }
+        }
+
+        return statusEntries;
+    }
+
+    public List<StatusEntry> GetStatus(List<string> gitRootDirectories)
+    {
+        #region Verify Parameters
+
+        if (gitRootDirectories == null)
+        {
+            throw new ArgumentNullException("gitRootDirectories");
+        }
+
+        #endregion
+
+        List<StatusEntry> statusEntries = new();
+
+        foreach (string item in gitRootDirectories)
+        {
+            statusEntries.AddRange(GetStatus(item));
+        }
+
+        return statusEntries;
+    }
+
+    public bool IsDirectoryRootDirectory(string diretcoryPath)
+    {
+        #region Verify Parameters
+
+        if (string.IsNullOrWhiteSpace(diretcoryPath))
+        {
+            throw new ArgumentNullException("diretcoryPath");
+        }
+
+        if (!Directory.Exists(diretcoryPath))
+        {
+            throw new ArgumentException("Path does not exist.", "diretcoryPath");
+        }
+
+        #endregion
+
+        if (Directory.Exists(diretcoryPath + @"\.git"))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //[assembly: AssemblyTitle("WeebreeOpen.SystemLib")]
-[assembly: AssemblyDescription("Release Date: 2015-10-19")]
+//[assembly: AssemblyDescription("Release Date: 2015-10-19")]
 //[assembly: AssemblyConfiguration("")]
 //[assembly: AssemblyCompany("Weebree, Liechtenstein")]
 //[assembly: AssemblyProduct("WeebreeOpen.SystemLib")]

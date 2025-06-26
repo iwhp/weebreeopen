@@ -1,13 +1,9 @@
-﻿namespace WeebreeOpen.SystemLib.Scheduler.Model
-{
-    using System;
-    using System.Linq;
+﻿namespace WeebreeOpen.SystemLib.Scheduler.Model;
 
-    public enum TriggerFrequency
-    {
-        Once,
-        Daily,
-        Weekly,
-        Monthly
-    }
+public enum TriggerFrequency
+{
+    Once,
+    Daily,
+    Weekly,
+    Monthly
 }

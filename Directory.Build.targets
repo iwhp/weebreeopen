@@ -1,0 +1,35 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- #region Current Year -->
+
+  <!--
+    Does not work: © $(CurrentYear) Ardimedia, Liechtenstein. All rights reserved.
+    - It is not inserted in the NuGet package
+    - It is not inserted in the .dll assembly
+  -->
+
+  <UsingTask TaskName="GetCurrentYear" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <CurrentYear ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+          CurrentYear = System.DateTime.UtcNow.Year.ToString();
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="SetAssemblyInfoMetadata" BeforeTargets="Initialize">
+    <GetCurrentYear>
+      <Output TaskParameter="CurrentYear" PropertyName="CurrentYear" />
+    </GetCurrentYear>
+    <PropertyGroup>
+      <Copyright>© $(CurrentYear) Ardimedia, Liechtenstein. All rights reserved.</Copyright>
+    </PropertyGroup>
+  </Target>
+
+  <!-- #endregion -->
+
+</Project>

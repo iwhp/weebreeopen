@@ -1,0 +1,69 @@
+<Project>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <SolutionRoot>$(MSBuildThisFileDirectory)</SolutionRoot>
+    <IconPath>$(SolutionRoot)nuget.png</IconPath>
+    <!--<IsPackable>false</IsPackable>-->
+  </PropertyGroup>
+
+  <PropertyGroup>
+
+    <!-- Shared Metadata -->
+    <Authors>Ardimedia, Liechtenstein</Authors>
+    <Company>Ardimedia, Liechtenstein</Company>
+    <Description>Should by overriden in .csproj.</Description>
+    <RepositoryUrl>https://dev.azure.com/ardimedia/am.code</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>nuget.png</PackageIcon>
+    <IncludePackageIcon>true</IncludePackageIcon>
+
+    <!-- Versioning -->
+    <VersionPrefix>4.0.0</VersionPrefix>
+    <PackageVersion Condition=" '$(BUILD_BUILDNUMBER)' == '' ">$(VersionPrefix)-local</PackageVersion>
+    <PackageVersion Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(VersionPrefix)-$(BUILD_BUILDNUMBER)</PackageVersion>
+
+    <!-- Assembly version info -->
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+    <InformationalVersion>$(PackageVersion)</InformationalVersion>
+
+    <!-- Symbol info -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PrivateAssets>all</PrivateAssets>
+
+    <!-- NuGet -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <!-- Custom flags -->
+    <!--
+        UseLocalLibrary is a custom boolean flag to control whether your project references local versions of libraries (projects) or uses external sources:
+        <ItemGroup Condition=" '$(UseLocalLibrary)' == 'true' ">
+        <ItemGroup Condition=" '$(UseLocalLibrary)' != 'true' ">
+    -->
+    <UseLocalLibrary>$([System.String]::IsNullOrEmpty('$(BUILD_BUILDNUMBER)'))</UseLocalLibrary>
+
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.Cutglib.NuGetPackage'">5.2.2</VersionPrefix>
+    <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.GuptaSqlBase'">12.3.1</VersionPrefix>
+    <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.Gupta.NuGetPackage.SqlBase'">12.3.1</VersionPrefix>
+    <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.Adobe.NuGetPackage.Win32'">6.0.1</VersionPrefix>
+
+    <PackageVersion Condition=" '$(BUILD_BUILDNUMBER)' == '' ">$(VersionPrefix)-local</PackageVersion>
+    <PackageVersion Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(VersionPrefix)-$(BUILD_BUILDNUMBER)</PackageVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="$(IconPath)" Pack="true" PackagePath="\" /> <!--Place nuget.png in the solution folder-->
+  </ItemGroup>
+
+</Project>

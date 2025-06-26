@@ -1,14 +1,10 @@
-﻿namespace WeebreeOpen.SystemLib.Scheduler.Model
-{
-    using System;
-    using System.Linq;
+﻿namespace WeebreeOpen.SystemLib.Scheduler.Model;
 
-    public enum FunctionName
-    {
-        LgtBcReportProcessOpenWorkOrders,
-        LgtBcReportCreateInvoice,
-        NestleIceErpCopyPdfCreatePreview,
-        NestleIceErpImportMdb,
-        NestleIceErpReportWorkOrderFinishedMissingProductionPrice
-    }
+public enum FunctionName
+{
+    LgtBcReportProcessOpenWorkOrders,
+    LgtBcReportCreateInvoice,
+    NestleIceErpCopyPdfCreatePreview,
+    NestleIceErpImportMdb,
+    NestleIceErpReportWorkOrderFinishedMissingProductionPrice
 }

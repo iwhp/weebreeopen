@@ -1,149 +1,147 @@
-﻿namespace WeebreeOpen.SystemLib.FileWatcher
+﻿using System;
+using System.IO;
+using System.Threading;
+
+namespace WeebreeOpen.SystemLib.FileWatcher;
+
+public class FileSystemWatcherHelper : FileSystemWatcher
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Threading;
+    // set a reasonable maximum interval time
+    public readonly int MaxInterval = 60000;
 
-    public class FileSystemWatcherHelper : FileSystemWatcher
+    public event PathAvailabilityHandler EventPathAvailability = delegate { };
+
+    public string Name = "FileSystemWatcherEx";
+    private bool isNetworkAvailable = true;
+    private int interval = 100;
+    private Thread thread = null;
+    private bool run = false;
+
+    #region Constructors
+
+    //--------------------------------------------------------------------------------
+    public FileSystemWatcherHelper()
+        : base()
     {
-        // set a reasonable maximum interval time
-        public readonly int MaxInterval = 60000;
+        CreateThread();
+    }
 
-        public event PathAvailabilityHandler EventPathAvailability = delegate { };
+    //--------------------------------------------------------------------------------
+    public FileSystemWatcherHelper(string path)
+        : base(path)
+    {
+        CreateThread();
+    }
 
-        public string Name = "FileSystemWatcherEx";
-        private bool isNetworkAvailable = true;
-        private int interval = 100;
-        private Thread thread = null;
-        private bool run = false;
+    //--------------------------------------------------------------------------------
+    public FileSystemWatcherHelper(int interval)
+        : base()
+    {
+        this.interval = interval;
+        CreateThread();
+    }
 
-        #region Constructors
+    //--------------------------------------------------------------------------------
+    public FileSystemWatcherHelper(string path, int interval)
+        : base(path)
+    {
+        this.interval = interval;
+        CreateThread();
+    }
 
-        //--------------------------------------------------------------------------------
-        public FileSystemWatcherHelper()
-            : base()
+    //--------------------------------------------------------------------------------
+    public FileSystemWatcherHelper(int interval, string name)
+        : base()
+    {
+        this.interval = interval;
+        Name = name;
+        CreateThread();
+    }
+
+    //--------------------------------------------------------------------------------
+    public FileSystemWatcherHelper(string path, int interval, string name)
+        : base(path)
+    {
+        this.interval = interval;
+        Name = name;
+        CreateThread();
+    }
+
+    #endregion Constructors
+
+    #region Helper Methods
+
+    //--------------------------------------------------------------------------------
+    /// <summary>
+    /// Creates the thread if the interval is greater than 0 milliseconds 
+    /// </summary>
+    private void CreateThread()
+    {
+        // Normalize  the interval
+        interval = Math.Max(0, Math.Min(interval, MaxInterval));
+        // If the interval is 0, this indicates we don't want to monitor the path 
+        // for availability.
+        if (interval > 0)
         {
-            this.CreateThread();
+            thread = new Thread(new ThreadStart(MonitorFolderAvailability));
+            thread.Name = Name;
+            thread.IsBackground = true;
         }
+    }
 
-        //--------------------------------------------------------------------------------
-        public FileSystemWatcherHelper(string path)
-            : base(path)
+    //--------------------------------------------------------------------------------
+    /// <summary>
+    /// Attempts to start the monitoring thread
+    /// </summary>
+    public void StartFolderMonitor()
+    {
+        run = true;
+        if (thread != null)
         {
-            this.CreateThread();
+            thread.Start();
         }
+    }
 
-        //--------------------------------------------------------------------------------
-        public FileSystemWatcherHelper(int interval)
-            : base()
+    //--------------------------------------------------------------------------------
+    /// <summary>
+    /// Attempts to start the monitoring thread
+    /// </summary>
+    public void StopFolderMonitor()
+    {
+        run = false;
+    }
+
+    #endregion Helper Methods
+
+    /// <summary>
+    /// The thread method. It sits and spins making sure the folder exists
+    /// </summary>
+    public void MonitorFolderAvailability()
+    {
+        while (run)
         {
-            this.interval = interval;
-            this.CreateThread();
-        }
-
-        //--------------------------------------------------------------------------------
-        public FileSystemWatcherHelper(string path, int interval)
-            : base(path)
-        {
-            this.interval = interval;
-            this.CreateThread();
-        }
-
-        //--------------------------------------------------------------------------------
-        public FileSystemWatcherHelper(int interval, string name)
-            : base()
-        {
-            this.interval = interval;
-            this.Name = name;
-            this.CreateThread();
-        }
-
-        //--------------------------------------------------------------------------------
-        public FileSystemWatcherHelper(string path, int interval, string name)
-            : base(path)
-        {
-            this.interval = interval;
-            this.Name = name;
-            this.CreateThread();
-        }
-
-        #endregion Constructors
-
-        #region Helper Methods
-
-        //--------------------------------------------------------------------------------
-        /// <summary>
-        /// Creates the thread if the interval is greater than 0 milliseconds 
-        /// </summary>
-        private void CreateThread()
-        {
-            // Normalize  the interval
-            this.interval = Math.Max(0, Math.Min(this.interval, this.MaxInterval));
-            // If the interval is 0, this indicates we don't want to monitor the path 
-            // for availability.
-            if (this.interval > 0)
+            if (isNetworkAvailable)
             {
-                this.thread = new Thread(new ThreadStart(this.MonitorFolderAvailability));
-                this.thread.Name = this.Name;
-                this.thread.IsBackground = true;
-            }
-        }
-
-        //--------------------------------------------------------------------------------
-        /// <summary>
-        /// Attempts to start the monitoring thread
-        /// </summary>
-        public void StartFolderMonitor()
-        {
-            this.run = true;
-            if (this.thread != null)
-            {
-                this.thread.Start();
-            }
-        }
-
-        //--------------------------------------------------------------------------------
-        /// <summary>
-        /// Attempts to start the monitoring thread
-        /// </summary>
-        public void StopFolderMonitor()
-        {
-            this.run = false;
-        }
-
-        #endregion Helper Methods
-
-        /// <summary>
-        /// The thread method. It sits and spins making sure the folder exists
-        /// </summary>
-        public void MonitorFolderAvailability()
-        {
-            while (this.run)
-            {
-                if (this.isNetworkAvailable)
+                if (!Directory.Exists(base.Path))
                 {
-                    if (!Directory.Exists(base.Path))
-                    {
-                        this.isNetworkAvailable = false;
-                        this.RaiseEventNetworkPathAvailablity();
-                    }
+                    isNetworkAvailable = false;
+                    RaiseEventNetworkPathAvailablity();
                 }
-                else
-                {
-                    if (Directory.Exists(base.Path))
-                    {
-                        this.isNetworkAvailable = true;
-                        this.RaiseEventNetworkPathAvailablity();
-                    }
-                }
-                Thread.Sleep(this.interval);
             }
+            else
+            {
+                if (Directory.Exists(base.Path))
+                {
+                    isNetworkAvailable = true;
+                    RaiseEventNetworkPathAvailablity();
+                }
+            }
+            Thread.Sleep(interval);
         }
+    }
 
-        private void RaiseEventNetworkPathAvailablity()
-        {
-            this.EventPathAvailability(this, new PathAvailablitiyEventArgs(this.isNetworkAvailable));
-        }
+    private void RaiseEventNetworkPathAvailablity()
+    {
+        EventPathAvailability(this, new PathAvailabilityEventArgs(isNetworkAvailable));
     }
 }

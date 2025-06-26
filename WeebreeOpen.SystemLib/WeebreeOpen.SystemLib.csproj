@@ -3,29 +3,15 @@
   <PropertyGroup>
     <TargetFrameworks>net48;net9.0</TargetFrameworks>
     <OutputType>Library</OutputType>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <LangVersion>latest</LangVersion>
 
     <PackageId>WeebreeOpen.SystemLib</PackageId>
-    <!--<Description>Core system utilities for WeebreeOpen</Description>-->
-    <Authors>Harry Pfleger</Authors>
-    <Version>0.0.5-beta</Version>
+    <Description>Core system utilities for WeebreeOpen</Description>
+    <Authors>Weebree</Authors>
+    <Version>0.0.6-beta</Version>
+    <VersionPrefix>$(Version)</VersionPrefix>
+    <PackageVersion>$(VersionPrefix)</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Update="FileWatcher\FileSystemWatcherHelper.cs">
-      <SubType>Component</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="README.txt" />
-    <Content Include="FileWatcher\README.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath=""/>
-  </ItemGroup>
 
 </Project>

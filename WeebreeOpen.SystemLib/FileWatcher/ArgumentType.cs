@@ -1,17 +1,13 @@
-﻿namespace WeebreeOpen.SystemLib.FileWatcher
-{
-    using System;
-    using System.Linq;
+﻿namespace WeebreeOpen.SystemLib.FileWatcher;
 
-    /// <summary>
-    /// This enum is used to indicate which argument type is valid in the WatcherEventArgs object.
-    /// </summary>
-    public enum ArgumentType
-    {
-        FileSystem,
-        Renamed,
-        Error,
-        StandardEvent,
-        PathAvailability
-    }
+/// <summary>
+/// This enum is used to indicate which argument type is valid in the WatcherEventArgs object.
+/// </summary>
+public enum ArgumentType
+{
+    FileSystem,
+    Renamed,
+    Error,
+    StandardEvent,
+    PathAvailability
 }
