@@ -5,8 +5,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <SolutionRoot>$(MSBuildThisFileDirectory)</SolutionRoot>
+    <!-- Generate the XML next to the DLL -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Don't flood build with missing-doc warnings -->
+    <NoWarn>$(NoWarn);1591</NoWarn>
     <IconPath>$(SolutionRoot)nuget.png</IconPath>
     <!--<IsPackable>false</IsPackable>-->
+    <HotReloadAutoRestart>true</HotReloadAutoRestart>
+    <!-- Do not generate namespace with name subfolder names -->
+    <!--<RazorGenerateSubNamespaces>false</RazorGenerateSubNamespaces>-->
   </PropertyGroup>
 
   <PropertyGroup>
@@ -14,6 +21,8 @@
     <!-- Shared Metadata -->
     <Authors>Ardimedia, Liechtenstein</Authors>
     <Company>Ardimedia, Liechtenstein</Company>
+    <BuildYear Condition="'$(BuildYear)' == ''">$(MSBuildThisYear)</BuildYear>
+    <Copyright>Copyright © $(BuildYear) Ardimedia</Copyright>
     <Description>Should by overriden in .csproj.</Description>
     <RepositoryUrl>https://dev.azure.com/ardimedia/am.code</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -40,6 +49,9 @@
 
     <!-- NuGet -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <!--<PackAsTool>false</PackAsTool>-->
+    <!--<IsTool>false</IsTool>-->
+    <PackageOutputPath>$(OutputPath)</PackageOutputPath>
 
     <!-- Custom flags -->
     <!--
@@ -52,14 +64,24 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.Cutglib.NuGetPackage'">5.2.2</VersionPrefix>
+    <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.Cutglib.NuGetPackage'">5.3.0</VersionPrefix>
+    <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.Ghostscript.NugetPackage'">10.06.0</VersionPrefix>
     <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.GuptaSqlBase'">12.3.1</VersionPrefix>
     <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.Gupta.NuGetPackage.SqlBase'">12.3.1</VersionPrefix>
     <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.Adobe.NuGetPackage.Win32'">6.0.1</VersionPrefix>
+    <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.AdobePdf'">6.0.1</VersionPrefix>
+    <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.AdobeAcrobat'">6.0.1</VersionPrefix>
+    <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.AdobeInDesign'">6.0.1</VersionPrefix>
+    <VersionPrefix Condition="'$(MSBuildProjectName)'=='Am.AdobePhotoshop'">6.0.1</VersionPrefix>
 
     <PackageVersion Condition=" '$(BUILD_BUILDNUMBER)' == '' ">$(VersionPrefix)-local</PackageVersion>
     <PackageVersion Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(VersionPrefix)-$(BUILD_BUILDNUMBER)</PackageVersion>
   </PropertyGroup>
+
+  <!-- SourceLink for all projects -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="10.0.200" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
