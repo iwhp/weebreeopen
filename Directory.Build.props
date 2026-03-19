@@ -12,6 +12,8 @@
     <IconPath>$(SolutionRoot)nuget.png</IconPath>
     <!--<IsPackable>false</IsPackable>-->
     <HotReloadAutoRestart>true</HotReloadAutoRestart>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <!-- Do not generate namespace with name subfolder names -->
     <!--<RazorGenerateSubNamespaces>false</RazorGenerateSubNamespaces>-->
   </PropertyGroup>
